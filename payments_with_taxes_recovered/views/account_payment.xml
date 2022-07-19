@@ -1,0 +1,32 @@
+<odoo>
+  <data>
+      <record  id="tecnika_dassa_account_payment_tree" model="ir.ui.view">
+      <field name="name">tecnika.dassa_account_payment_tree_form</field>
+      <field name="model">account.payment</field>
+      <field name="inherit_id" ref="account.view_account_payment_tree"/>
+      <field name="arch" type="xml">
+            <field name="journal_id" position="after">
+                 <field name="cash_payment" />
+                 <field name="cash_tax_paid" />
+                <field name="credit_payment" />
+                <field name="credit_tax_paid" />
+            </field>
+      </field>
+    </record>
+
+    <record  id="tecnika_dassa_account_payment_form" model="ir.ui.view">
+      <field name="name">tecnika.dassa_account_payment_form</field>
+      <field name="model">account.payment</field>
+      <field name="inherit_id" ref="account.view_account_payment_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='partner_id']" position="after">
+            <field name='reconciled_invoice_ids' invisible="1" />
+            <field name="cash_payment"  attrs="{'invisible': ['|', ('state', 'not in', ['posted']), '|', ('cash_payment', '=', 0.00), ('reconciled_invoice_ids', '=', False)]}"/>
+            <field name="cash_tax_paid" attrs="{'invisible': ['|', ('state', 'not in', ['posted']), '|', ('cash_payment', '=', 0.00), ('reconciled_invoice_ids', '=', False)]}"/>
+            <field name="credit_payment" attrs="{'invisible': ['|', ('state', 'not in', ['posted']), '|', ('credit_payment', '=', 0.00), ('reconciled_invoice_ids', '=', False)]}"/>
+            <field name="credit_tax_paid" attrs="{'invisible': ['|', ('state', 'not in', ['posted']), '|', ('credit_payment', '=', 0.00), ('reconciled_invoice_ids', '=', False)]}"/>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>

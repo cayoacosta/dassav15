@@ -1,0 +1,422 @@
+<odoo>
+    <data>
+        <report id="ctt_dassa_reports_exist_ventas_report"
+                model="report.exist_ventas"
+                string="Reporte de existencias y ventas"
+                report_type="qweb-pdf"
+                name="ctt_dassa_reports.exist_ventas"
+                file="ctt_dassa_reports.exist_ventas_report"
+                attachment_use="True"
+                print_report_name="('REPORTE DE EXISTENCIAS Y VENTAS')"
+                paperformat="ctt_dassa_reports.paperformat_carta_landscape" />
+        
+        <template id="exist_ventas">
+            <t t-call="web.html_container">
+                <t t-call="ctt_dassa_reports.external_layout_modubic_dassa">
+                    <t t-foreach="docs" t-as="doc"> 
+                        <div class="page">
+                            <div><strong>Filtros aplicados</strong></div>
+
+                                    <div style="float:left;width:33%;">
+                                        <div>
+                                            Sucursal: <t t-esc="doc.sucursal.name"/>
+                                        </div>
+                                        <div>
+                                            Almacén: <t t-if="len(doc.warehouse_ids)==0">Todos</t><t t-else=""> Selecciono <t t-esc="len(doc.warehouse_ids)"/> almacenes</t>
+                                        </div>
+                                        <div>
+                                            Productos: 
+                                            <t t-if="len(doc.product_ids)==0">
+                                                Todos
+                                            </t>
+                                            <t t-else="">
+                                                Selecciono <t t-esc="len(doc.product_ids)"/> productos
+                                            </t>
+                                        </div>
+                                        <div>
+                                            <t t-if="len(doc.product_ids)==0">
+                                                Agrupación: <t t-if="doc.agrupation=='line'">Linea</t><t t-else="">Marca</t>
+                                            </t>
+                                        </div>
+                                        <div>
+                                            <t t-if="len(doc.agrupation)=='line' and len(doc.product_ids)>0">
+                                                Selecciono: <t t-esc="len(doc.category_ids)"/> categorias
+                                            </t>
+                                            <t t-elif="len(doc.agrupation)=='brand' and len(doc.product_ids)>0">
+                                                Selecciono: <t t-esc="len(doc.brand_ids)"/> marcas
+                                            </t>
+                                        </div>
+                                    </div>
+                                    <div style="float:left;width:33%;">
+                                        <div>
+                                            Rango de fechas:
+                                            <div>
+                                                de
+                                                <t t-if="doc.begin_month=='1'">
+                                                    Enero
+                                                </t>
+                                                <t t-elif="doc.begin_month=='2'">
+                                                    Febrero
+                                                </t>
+                                                <t t-elif="doc.begin_month=='3'">
+                                                    Marzo
+                                                </t>
+                                                <t t-elif="doc.begin_month=='4'">
+                                                    Abril
+                                                </t>
+                                                <t t-elif="doc.begin_month=='5'">
+                                                    Mayo
+                                                </t>
+                                                <t t-elif="doc.begin_month=='6'">
+                                                    Junio
+                                                </t>
+                                                <t t-elif="doc.begin_month=='7'">
+                                                    Julio
+                                                </t>
+                                                <t t-elif="doc.begin_month=='8'">
+                                                    Agosto
+                                                </t>
+                                                <t t-elif="doc.begin_month=='9'">
+                                                    Septiembre
+                                                </t>
+                                                <t t-elif="doc.begin_month=='10'">
+                                                    Octubre
+                                                </t>
+                                                <t t-elif="doc.begin_month=='11'">
+                                                    Noviembre
+                                                </t>
+                                                <t t-elif="doc.begin_month=='12'">
+                                                    Diciembre
+                                                </t>
+                                                -<t t-esc="doc.begin_year"/>
+                                            </div>
+                                            <div>
+                                                a 
+                                                <t t-if="doc.end_month=='1'">
+                                                    Enero
+                                                </t>
+                                                <t t-elif="doc.end_month=='2'">
+                                                    Febrero
+                                                </t>
+                                                <t t-elif="doc.end_month=='3'">
+                                                    Marzo
+                                                </t>
+                                                <t t-elif="doc.end_month=='4'">
+                                                    Abril
+                                                </t>
+                                                <t t-elif="doc.end_month=='5'">
+                                                    Mayo
+                                                </t>
+                                                <t t-elif="doc.end_month=='6'">
+                                                    Junio
+                                                </t>
+                                                <t t-elif="doc.end_month=='7'">
+                                                    Julio
+                                                </t>
+                                                <t t-elif="doc.end_month=='8'">
+                                                    Agosto
+                                                </t>
+                                                <t t-elif="doc.end_month=='9'">
+                                                    Septiembre
+                                                </t>
+                                                <t t-elif="doc.end_month=='10'">
+                                                    Octubre
+                                                </t>
+                                                <t t-elif="doc.end_month=='11'">
+                                                    Noviembre
+                                                </t>
+                                                <t t-elif="doc.end_month=='12'">
+                                                    Diciembre
+                                                </t>
+                                                -<t t-esc="doc.end_year"/>
+                                            </div>
+                                            
+                                            <div>
+                                               meses venta: <t t-esc="doc.month_sales"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="float:left;width:33%;">
+                                        <div>
+                                            Exedentes: <t t-if="doc.exedentes_ok==True">Activado</t><t t-else="">No activado</t>
+                                        </div>
+                                        <div>
+                                            No Exedentes: <t t-if="doc.no_exedentes_ok==True">Activado</t><t t-else="">No activado</t>
+                                        </div>
+                                        <div>
+                                            Solo productos con saldo: <t t-if="doc.inc_solo_prod_saldo==True">Activado</t><t t-else="">No activado</t>
+                                        </div>
+                                    </div>
+                            <div style="clear: both">
+                                <h2>Reporte de Existencias y ventas, de 
+                                    <t t-if="doc.begin_month=='1'">
+                                        Enero
+                                    </t>
+                                    <t t-elif="doc.begin_month=='2'">
+                                        Febrero
+                                    </t>
+                                    <t t-elif="doc.begin_month=='3'">
+                                        Marzo
+                                    </t>
+                                    <t t-elif="doc.begin_month=='4'">
+                                        Abril
+                                    </t>
+                                    <t t-elif="doc.begin_month=='5'">
+                                        Mayo
+                                    </t>
+                                    <t t-elif="doc.begin_month=='6'">
+                                        Junio
+                                    </t>
+                                    <t t-elif="doc.begin_month=='7'">
+                                        Julio
+                                    </t>
+                                    <t t-elif="doc.begin_month=='8'">
+                                        Agosto
+                                    </t>
+                                    <t t-elif="doc.begin_month=='9'">
+                                        Septiembre
+                                    </t>
+                                    <t t-elif="doc.begin_month=='10'">
+                                        Octubre
+                                    </t>
+                                    <t t-elif="doc.begin_month=='11'">
+                                        Noviembre
+                                    </t>
+                                    <t t-elif="doc.begin_month=='12'">
+                                        Diciembre
+                                    </t>
+                                    
+                                    <t t-esc="doc.begin_year"/> a 
+                                     
+                                    <t t-if="doc.end_month=='1'">
+                                        Enero
+                                    </t>
+                                    <t t-elif="doc.end_month=='2'">
+                                        Febrero
+                                    </t>
+                                    <t t-elif="doc.end_month=='3'">
+                                        Marzo
+                                    </t>
+                                    <t t-elif="doc.end_month=='4'">
+                                        Abril
+                                    </t>
+                                    <t t-elif="doc.end_month=='5'">
+                                        Mayo
+                                    </t>
+                                    <t t-elif="doc.end_month=='6'">
+                                        Junio
+                                    </t>
+                                    <t t-elif="doc.end_month=='7'">
+                                        Julio
+                                    </t>
+                                    <t t-elif="doc.end_month=='8'">
+                                        Agosto
+                                    </t>
+                                    <t t-elif="doc.end_month=='9'">
+                                        Septiembre
+                                    </t>
+                                    <t t-elif="doc.end_month=='10'">
+                                        Octubre
+                                    </t>
+                                    <t t-elif="doc.end_month=='11'">
+                                        Noviembre
+                                    </t>
+                                    <t t-elif="doc.end_month=='12'">
+                                        Diciembre
+                                    </t>
+                                    <t t-esc="doc.end_year"/></h2>
+                            </div>
+                            <t t-set="total_headers" t-value="0"/>
+                            <t t-set="sum_total_enero" t-value="0"/>
+                            <t t-set="sum_total_febrero" t-value="0"/>
+                            <t t-set="sum_total_marzo" t-value="0"/>
+                            <t t-set="sum_total_abril" t-value="0"/>
+                            <t t-set="sum_total_mayo" t-value="0"/>
+                            <t t-set="sum_total_junio" t-value="0"/>
+                            <t t-set="sum_total_julio" t-value="0"/>
+                            <t t-set="sum_total_agosto" t-value="0"/>
+                            <t t-set="sum_total_septiembre" t-value="0"/>
+                            <t t-set="sum_total_octubre" t-value="0"/>
+                            <t t-set="sum_total_noviembre" t-value="0"/>
+                            <t t-set="sum_total_diciembre" t-value="0"/>
+                            <t t-set="sum_total_exist" t-value="0"/>
+                            <t t-set="sum_total_saldo" t-value="0"/>
+                            <t t-set="sum_total_frec" t-value="0"/>
+                            <t t-set="sum_total_ventas_total" t-value="0"/>
+                            <t t-set="sum_total_sale_prom" t-value="0"/>
+                            <t t-set="sum_total_period_sug" t-value="0"/>
+                            <t t-set="sum_total_reserved_quants" t-value="0"/>
+                            <table style="width:100%; border-collapse: collapse;margin:0;border-spacing: 0; margin-top: 0;page-break-after:always;">
+                                <thead style="display:table-header-group;font-size:12px">
+                                    <tr>
+                                        <th>
+                                            <div>Producto</div>
+                                        </th>
+                                        <th>
+                                            <div>Desc</div>
+                                        </th>
+                                        <t t-foreach="doc.exist_vent_line" t-as="header">
+                                            <t t-if="header.type=='h'">
+                                                <th>
+                                                    <div><t t-esc="header.month_name"/></div>
+                                                </th>
+                                            </t>
+                                        </t>
+                                        <th>
+                                            <div>Exist.</div>
+                                        </th>
+
+                                        <th>
+                                            <div>Saldo I.</div>
+                                        </th>
+                                        <th>
+                                            <div>Frec</div>
+                                        </th>
+                                        <th>
+                                            <div>Gpo.</div>
+                                        </th>
+                                        <th>
+                                            <div>Vtas. Tot.</div>
+                                        </th>
+
+                                        <th>
+                                            <div>V. prom</div>
+                                        </th>
+                                        <th>
+                                            <div>P. sug</div>
+                                        </th>
+                                        <th>
+                                            <div>Cant. Res</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                
+                                <t t-set="old_product" t-value="0"/>
+                                <t t-set="new_product" t-value="0"/>
+                                <t t-foreach="doc.exist_vent_line" t-as="line">
+                                    <t t-if="line.type=='d'">
+                                        
+                                            <t t-set="last_month_exist" t-value="0"/>
+                                            <t t-set="sale_prom" t-value="line.sale_total*doc.count_months"/>
+                                            <t t-set="period_sug" t-value="sale_prom*float(doc.month_sales)"/>
+                                            <t t-set="show_row" t-value="0"/>
+                                            <t t-if="doc.exedentes_ok==True and doc.no_exedentes_ok==True">
+                                                <t t-if="line.cant_vend>period_sug or period_sug>line.cant_vend">
+                                                    <t t-set="show_row" t-value="1"/>
+                                                </t>
+                                            </t>
+                                            <t t-elif="doc.exedentes_ok==True">
+                                                <t t-if="line.cant_vend>period_sug">
+                                                    <t t-set="show_row" t-value="1"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <t t-set="show_row" t-value="0"/>
+                                                </t>
+                                            </t>
+                                            <t t-elif="doc.no_exedentes_ok==True">
+                                               <t t-if="period_sug>=line.cant_vend">
+                                                    <t t-set="show_row" t-value="1"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <t t-set="show_row" t-value="0"/>
+                                                </t>
+                                            </t>
+                                            <t t-if="doc.no_exedentes_ok==False and doc.no_exedentes_ok==False">
+                                                <t t-set="show_row" t-value="1"/>
+                                            </t>
+                                            
+                                            <t t-if="show_row==1">
+                                                <tr>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="line.product_id.default_code"/></td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px;padding-right:2px"><t t-esc="line.product_id.name"/></td>
+                                                    
+                                                    <t t-if="line.header_count>=1"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend)"/></td><t t-set="sum_total_enero" t-value="sum_total_enero + line.cant_vend"/></t>
+                                                    <t t-if="line.header_count>=2"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend2)"/></td><t t-set="sum_total_febrero" t-value="sum_total_febrero + line.cant_vend2"/></t>
+                                                    <t t-if="line.header_count>=3"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend3)"/></td><t t-set="sum_total_marzo" t-value="sum_total_marzo + line.cant_vend3"/></t>
+                                                    <t t-if="line.header_count>=4"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend4)"/></td><t t-set="sum_total_abril" t-value="sum_total_abril + line.cant_vend4"/></t>
+                                                    <t t-if="line.header_count>=5"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend5)"/></td><t t-set="sum_total_mayo" t-value="sum_total_mayo + line.cant_vend5"/></t>
+                                                    <t t-if="line.header_count>=6"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend6)"/></td><t t-set="sum_total_junio" t-value="sum_total_junio + line.cant_vend6"/></t>
+                                                    <t t-if="line.header_count>=7"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend7)"/></td><t t-set="sum_total_julio" t-value="sum_total_julio + line.cant_vend7"/></t>
+                                                    <t t-if="line.header_count>=8"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend8)"/></td><t t-set="sum_total_agosto" t-value="sum_total_agosto + line.cant_vend8"/></t>
+                                                    <t t-if="line.header_count>=9"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend9)"/></td><t t-set="sum_total_septiembre" t-value="sum_total_septiembre + line.cant_vend9"/></t>
+                                                    <t t-if="line.header_count>=10"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend10)"/></td><t t-set="sum_total_octubre" t-value="sum_total_octubre + line.cant_vend10"/></t>
+                                                    <t t-if="line.header_count>=11"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend11)"/></td><t t-set="sum_total_noviembre" t-value="sum_total_noviembre + line.cant_vend11"/></t>
+                                                    <t t-if="line.header_count>=12"><td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.cant_vend12)"/></td><t t-set="sum_total_diciembre" t-value="sum_total_diciembre + line.cant_vend12"/></t>
+                                                    
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.exist_actual)"/></td>
+<!--                                                     <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">saldo i<t t-esc="'{0:,.2f}'.format(last_month_exist*line.product_id.standard_price)"/></td>  -->
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.exist_actual*line.product_id.standard_price)"/></td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="line.frec"/></td>
+
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px">
+                                                        <t t-if="line.frec>=0 and 2>=line.frec">
+                                                            D
+                                                        </t>
+                                                        <t t-elif="line.frec>=3 and 6>=line.frec">
+                                                            C
+                                                        </t>
+                                                        <t t-elif="line.frec>=7 and 9>=line.frec">
+                                                            B
+                                                        </t>
+                                                        <t t-elif="line.frec>=10 and 12>=line.frec">
+                                                            A
+                                                        </t>
+                                                    </td>
+
+
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(line.sale_total)"/></td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(sale_prom)"/></td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="'{0:,.2f}'.format(period_sug)"/></td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><t t-esc="line.reserved_quants"/></td>
+                                                    
+                                                    <t t-set="sum_total_sale_prom" t-value="sum_total_sale_prom + sale_prom"/>
+                                                    <t t-set="sum_total_period_sug" t-value="sum_total_period_sug + period_sug"/>
+                                                    <t t-set="sum_total_reserved_quants" t-value="sum_total_reserved_quants + line.reserved_quants"/>
+                                                </tr>
+                                            </t>
+
+                                            
+                                        
+                                    </t>
+                                    <t t-set="sum_total_exist" t-value="sum_total_exist + line.exist_actual"/>
+                                    <t t-set="sum_total_saldo" t-value="sum_total_saldo + (line.exist_actual*line.product_id.standard_price)"/>
+                                    <t t-set="sum_total_frec" t-value="sum_total_frec + line.frec"/>
+                                    <t t-set="sum_total_ventas_total" t-value="sum_total_ventas_total + line.sale_total"/>
+                                    <t t-set="total_headers" t-value="line.header_count"/>
+                                    
+                                </t>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <t t-if="total_headers>=1"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_enero)"/></b></td></t>
+                                    <t t-if="total_headers>=2"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_febrero)"/></b></td></t>
+                                    <t t-if="total_headers>=3"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_marzo)"/></b></td></t>
+                                    <t t-if="total_headers>=4"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_abril)"/></b></td></t>
+                                    <t t-if="total_headers>=5"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_mayo)"/></b></td></t>
+                                    <t t-if="total_headers>=6"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_junio)"/></b></td></t>
+                                    <t t-if="total_headers>=7"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_julio)"/></b></td></t>
+                                    <t t-if="total_headers>=8"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_agosto)"/></b></td></t>
+                                    <t t-if="total_headers>=9"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_septiembre)"/></b></td></t>
+                                    <t t-if="total_headers>=10"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_octubre)"/></b></td></t>
+                                    <t t-if="total_headers>=11"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_noviembre)"/></b></td></t>
+                                    <t t-if="total_headers>=12"><td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_diciembre)"/></b></td></t>
+<!--                                     <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_exist)"/></b></td> -->
+                                    <td style="text-align:left;border-top: 1px solid black;padding-right: 5px;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_exist)"/></b></td>
+<!--                                     <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_saldo)"/></b></td> -->
+                                    <td style="text-align:left;border-top: 1px solid black;padding-right: 5px;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_saldo)"/></b></td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="sum_total_frec"/></b></td>
+                                    <td style="border-top: 1px solid black;"></td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_ventas_total)"/></b></td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_sale_prom)"/></b></td>
+                                    <td style="border-top: 1px solid black;padding-right: 4px;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_period_sug)"/></b></td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top;font-size:12px"><b><t t-esc="'{0:,.2f}'.format(sum_total_reserved_quants)"/></b></td>
+                                </tr>
+                            </table>
+                            
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

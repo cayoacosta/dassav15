@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="dassa_report">
+    <t t-call="web.html_container" >
+        <t t-foreach="docs" t-as="o">
+            <t t-call="dassa_reports.dassa_report_more"/>
+        </t>
+    </t>
+</template>
+
+ <template id="dassa_report_more">
+    <t t-call="web.html_container">
+        <t t-call="web.external_layout">
+               <div class="page">
+               <style>
+               table {
+					    border: 1px solid;
+					    border-collapse: collapse;
+					 }
+				 td {
+					    border: none;
+					    class : text-left;
+					}
+				th {
+						class : text-left;
+					}
+               </style>
+                <div style=" margin: 0px 50px 0px 50px;">
+	                <div style="margin: 0px 0px 10px 82%">
+	                	<b>Date :</b>
+	                	<td ><span t-field="o.date"/></td>
+	               	</div>
+	               	<div style="margin: 25px 20px 75px 60px">
+               		<table style="border:none; width:80%">
+                  		<tr>
+		               		<td><b><span>Partner Name</span></b></td>
+							<td><b><span>Payment amount</span></b></td>
+						</tr>
+						<tr>
+		               		<td ><span t-field="o.partner_id"/></td>
+			               	<td ><span t-field="o.amount"/></td>
+                		</tr>
+                		<tr>
+                			<div style="height:20px;">
+                			<!-- <span t-esc="o.convert(amount)" t-as="number_txt"/> --> 
+                			<td><span t-esc="o.convert_amount_to_word(o,o.amount)" /></td>
+                			</div>
+                		</tr>
+	               	</table>
+	               	
+	               	</div>
+                   <tbody>
+                    <thead>
+	                    <div style="margin:50px 10px 30px 0px;">
+	                        <h4>Pago de factura</h4> 
+	                    </div>
+                       	<table style="width:100%; border: none;">
+	                        <tr>
+	                            <th style="width:35%"><span>Cuenta</span></th>
+	                            <th style="width:35%"><span>Nombre</span></th>
+	                            <th style="width:15%"><span>Debe</span></th>
+	                            <th style="width:15%"><span>Haber</span></th>
+	                    	</tr>
+                      	<table style="width:100%">
+		                    <tr t-foreach="o.line_ids" t-as="obj" > <!-- request.env['account.move.line'].search([('payment_id', '=', o.id)]) -->
+		 	                    <td style="width:35%"><span t-field="obj.account_id.code"/></td>
+		                    	<td style="width:35%"><span t-field="obj.account_id.name"/></td>
+		                    	<td style="width:15%"><span t-field="obj.debit"/></td>
+		                    	<td style="width:15%"><span t-field="obj.credit"/></td>    
+		                  	</tr>                               
+                     	</table>
+                     	<div style="height:50px;"></div>
+                     	<table style="width:100%">
+			                 <tr t-foreach="o.mapped('move_id').mapped('line_ids')" t-as="obj" > <!-- request.env['account.move.line'].search([('payment_id', '=', o.id)]) -->
+				                   	<td style="width:35%"><span t-field="obj.account_id"/></td>
+				                   	<td style="width:35%"><span t-field="obj.partner_id"/></td>
+				                   	<td style="width:15%"><span t-field="obj.debit"/></td>
+				                   	<td style="width:15%"><span t-field="obj.credit"/></td>                        
+			                 </tr>                                
+                     	</table>
+                       </table> 
+                    </thead>
+                    </tbody>
+                </div>
+              </div>
+           </t>
+       </t>      
+ </template>
+ </odoo>

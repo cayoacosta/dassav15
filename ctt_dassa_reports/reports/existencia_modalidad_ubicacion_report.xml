@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report id="ctt_dassa_reports_existencia_mod_ubicacion_report"
+                model="report.existencia_ubicacion"
+                string="Existencia modalidad por ubicación"
+                report_type="qweb-pdf"
+                name="ctt_dassa_reports.existencia_mod_ubicacion"
+                file="ctt_dassa_reports.existencia_mod_ubicacion_report"
+                attachment_use="True"
+                print_report_name="('REPORTE MODALIDAD POR UBICACIÓN')"
+                paperformat="base.paperformat_us"/>
+        <template id="existencia_mod_ubicacion">
+            <t t-call="web.html_container">
+                <t t-call="ctt_dassa_reports.external_layout_modubic_dassa">
+                    <t t-foreach="docs" t-as="doc">
+                        <div class="page">
+                            <strong>
+                                <div>Filtros aplicados</div>
+                            </strong>
+                            <div style="float:left;width:33%;">
+                                <div>
+                                    Almacén:
+                                    <t t-esc="doc.warehouse_id.name"/>
+                                </div>
+                                <div>
+                                    Fecha:
+                                    <t t-esc="doc.date.strftime('%d/%m/%Y')"/>
+                                </div>
+                            </div>
+                            <div style="float:left;width:33%;">
+                                <div>
+                                    Categorias:
+                                    <t t-if="len(doc.category_ids)==0">Todas</t>
+                                    <t t-else="">Selecciono
+                                        <t t-esc="len(doc.category_ids)"/>
+                                        categorias
+                                    </t>
+                                </div>
+                                <div>
+                                    solo productos con saldo:
+                                    <t t-if="doc.inc_solo_prod_saldo==True">Activado</t>
+                                    <t t-else="">Desactivado</t>
+                                </div>
+                                <div>
+                                    Filtro por descripción:
+                                    <t t-if="doc.desc==False">No ingreso</t>
+                                    <t t-else="">
+                                        <t t-esc="doc.desc"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div style="float:left;width:33%;">
+                                <div>
+                                    Mueble:
+                                    <t t-if="doc.mueble==False">Todos</t>
+                                    <t t-else="">
+                                        <t t-esc="doc.mueble"/>
+                                    </t>
+                                </div>
+                                <div>
+                                    Fila:
+                                    <t t-if="doc.fila==False">Todas</t>
+                                    <t t-else="">
+                                        <t t-esc="doc.fila"/>
+                                    </t>
+                                </div>
+                                <div>
+                                    Columna:
+                                    <t t-if="doc.columna==False">Todas</t>
+                                    <t t-else="">
+                                        <t t-esc="doc.columna"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div style="clear: both">
+                                <h2>Reporte de Existencias, del día
+                                    <t t-esc="doc.date.strftime('%d/%m/%Y')"/>
+                                </h2>
+                                <div>Información del almacén
+                                    <t t-esc="doc.warehouse_id.name"/>
+                                    selección de todas las lineas
+                                </div>
+                            </div>
+                            <t t-set="total_exist" t-value="0.00"/>
+                            <t t-set="total_standar_price" t-value="0.00"/>
+                            <t t-set="total_cost" t-value="0.00"/>
+                            <table style="width:100%; border-collapse: collapse;margin:0;border-spacing: 0; margin-top: 0;page-break-after:always;">
+                                <thead style="display:table-header-group;font-size:12px">
+                                    <tr>
+                                        <th>
+                                            <div>Producto</div>
+                                        </th>
+                                        <th>
+                                            <div>Descripción</div>
+                                        </th>
+                                        <th>
+                                            <div>Existencia</div>
+                                        </th>
+                                        <th>
+                                            <div>Costo</div>
+                                        </th>
+                                        <th>
+                                            <div>Costo Total</div>
+                                        </th>
+                                        <th>
+                                            <div>Ubicación</div>
+                                        </th>
+                                        <th>
+                                            <div>Gravado</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <t t-foreach="doc.lines" t-as="line">
+                                    <tr>
+                                        <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                            <t t-esc="line.code"/>
+                                        </td>
+                                        <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                            <t t-esc="line.product_id.name"/>
+                                        </td>
+                                        <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                            <t t-esc="'{:,.2f}'.format(line.exist)"/>
+                                        </td>
+                                        <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                            <t t-esc="'${:,.2f}'.format(line.product_id.standard_price)"/>
+                                        </td>
+                                        <td>
+                                            <t t-esc="'${:,.2f}'.format(line.exist * line.product_id.standard_price)"/>
+                                        </td>
+                                        <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                            <t t-esc="line.ubication"/>
+                                        </td>
+                                        <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                            <t t-if="line.grav==True">
+                                                <div>S</div>
+                                            </t>
+                                            <t t-else="">
+                                                <div>N</div>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                    <t t-set="total_exist" t-value="total_exist + line.exist"/>
+                                    <t t-set="total_standar_price"
+                                       t-value="total_standar_price + line.product_id.standard_price"/>
+                                    <t t-set="total_cost"
+                                       t-value="total_cost + (line.exist * line.product_id.standard_price)"/>
+                                </t>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                        <b>
+                                            <t t-esc="'{:,.2f}'.format(total_exist)"/>
+                                        </b>
+                                    </td>
+                                    <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                        <b>
+                                            <t t-esc="'${:,.2f}'.format(total_standar_price)"/>
+                                        </b>
+                                    </td>
+                                    <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                        <b>
+                                            <t t-esc="'${:,.2f}'.format(total_cost)"/>
+                                        </b>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

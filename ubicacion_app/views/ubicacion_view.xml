@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<odoo>
+
+  <record id="view_form_ubicacion" model="ir.ui.view">
+    <field name="name">ubicacion</field>
+    <field name="model">ubicacion</field>
+    <field name="arch" type="xml">
+    <form string="ubicacion">
+    <sheet>
+          <group>
+            <group>
+            <field name="product_id" />
+            <field name="warehouse_id" />
+            <field name="location_id" />
+            <field name="mueble" />
+            <field name="fila" />
+            <field name="columna" />
+            <field name="operating_unit_id"/>
+            <field name="active" />
+            </group>
+          </group>
+    </sheet>
+    </form>
+    </field>
+  </record>
+
+<record id="view_tree_ubicacion" model="ir.ui.view">
+  <field name="name">ubicacion List</field>
+  <field name="model">ubicacion</field>
+  <field name="arch" type="xml">
+    <tree>
+      <field name="product_id" />
+      <field name="warehouse_id" />
+      <field name="location_id" />
+      <field name="operating_unit_id"/>
+      <field name="mueble" />
+      <field name="fila" />
+      <field name="columna" />
+    </tree>
+  </field>
+</record>
+
+  <record id="view_search_ubicacion" model="ir.ui.view">
+    <field name="name">ubicacion Filters</field>
+    <field name="model">ubicacion</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="product_id"/>
+      </search>
+    </field>
+  </record>
+
+</odoo>

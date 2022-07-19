@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2018 Tecnativa - Sergio Teruel
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl-3). -->
+<odoo>
+	<data>
+        <record id="view_l10n_mx_edi_invoice_form_inherit" model="ir.ui.view">
+            <field name="name">l10n_mx_edi.invoice.form.inherit</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='amount_total']" position="after">
+                    <field name="margin"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

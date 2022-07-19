@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_ordenes_de_reparacion" model="ir.sequence">
+            <field name="name">Ordenes de Reparacion</field>
+            <field name="code">ordenes.de.reparacion</field>
+            <field name="prefix">ODR</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+		
+		<!-- Sequences for sale.order refacciones-->
+        <record id="seq_sale_order_refacciones" model="ir.sequence">
+            <field name="name">Sales Order refacciones</field>
+            <field name="code">sale.order.refacciones</field>
+            <field name="prefix">ORE</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <!-- Sequences for sale.order maquinaria-->
+        <record id="seq_sale_order_maquinaria" model="ir.sequence">
+            <field name="name">Sales Order maquinaria</field>
+            <field name="code">sale.order.maquinaria</field>
+            <field name="prefix">OMA</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+                <!-- Sequences for purchase.order refacciones-->
+        <record id="seq_purchase_order_refacciones" model="ir.sequence">
+            <field name="name">Purchase Order refacciones</field>
+            <field name="code">purchase.order.refacciones</field>
+            <field name="prefix">PRE</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequences for purchase.order maquinaria-->
+        <record id="seq_purchase_order_maquinaria" model="ir.sequence">
+            <field name="name">purchase Order maquinaria</field>
+            <field name="code">purchase.order.maquinaria</field>
+            <field name="prefix">PMA</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <!-- Sequences COMPRAS GASTOS Y REFACCIONES-->
+        <record id="seq_gastos" model="ir.sequence">
+            <field name="name">gastos</field>
+            <field name="code">purchase.order.gastos</field>
+            <field name="prefix">OGA</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+         <!-- Sequences COMPRAS GASTOS Y REFACCIONES-->
+        <record id="seq_taller" model="ir.sequence">
+            <field name="name">taller</field>
+            <field name="code">purchase.order.taller</field>
+            <field name="prefix">POT</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

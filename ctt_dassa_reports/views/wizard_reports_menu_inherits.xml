@@ -1,0 +1,28 @@
+<odoo>
+    <data>
+        <menuitem id="menu_existencia_ubicacion"  
+            name="Reporte - existencia modalidad por ubicación"  
+            action="launch_dassa_existencia_ubicacion" 
+            parent="stock.menu_warehouse_report"
+            sequence="100" />
+        
+        <menuitem id="menu_saldos"  
+            name="Reporte - saldos"  
+            action="launch_dassa_saldos" 
+            parent="stock.menu_warehouse_report"
+            sequence="101" />
+        
+        <menuitem id="menu_ventas_departamento"  
+            name="Reporte - ventas por departamento"  
+            action="launch_dassa_ventas_departamento" 
+            parent="sale.menu_sale_report"
+            sequence="100" />
+        
+        <menuitem id="menu_exist_ventas"  
+            name="Reporte - existencias y ventas"  
+            action="launch_dassa_exist_ventas" 
+            parent="sale.menu_sale_report"
+            sequence="101" />
+        
+    </data>
+</odoo>

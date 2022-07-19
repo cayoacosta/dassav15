@@ -1,0 +1,25 @@
+<odoo>
+    <data>
+        <template id="external_layout_ventdep_dassa">
+            <t t-name="web.external_layout_saldo_dassa">
+                <t t-if="not o" t-set="o" t-value="doc"/>
+
+                <t t-if="not company">
+                    <!-- Multicompany -->
+                    <t t-if="company_id">
+                        <t t-set="company" t-value="company_id"/>
+                    </t>
+                    <t t-elif="o and 'company_id' in o">
+                        <t t-set="company" t-value="o.company_id.sudo()"/>
+                    </t>
+                    <t t-else="else">
+                        <t t-set="company" t-value="res_company"/>
+                    </t>
+                </t>
+
+                <t t-call="ctt_dassa_reports.external_layout_standard_ventdep_dassa"><t t-raw="0"/></t>
+
+            </t>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!--   <record model="ir.ui.view" id="view_ordenes_de_reparacion_form">
+        <field name="name">ordenes.de.reparacion.form</field>
+        <field name="model">ordenes.de.reparacion</field>
+        <field name="inherit_id" ref="taller.view_ordenes_de_reparacion_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_price']" position="after">
+                    <field name="margin" groups="base.group_user"/>
+            </xpath>
+        </field>
+    </record> -->
+
+</odoo>

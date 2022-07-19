@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="ubicacion_list_template" name="ubicacion List">
+  <div id="wrap" class="container">
+    <h1>Ubicacion</h1>
+      <t t-foreach="ubicacion" t-as="ubicacion">
+        <div class="row">
+          <span t-field="ubicacion.name" />,
+          <!--<span t-field="book.date_published" />,
+          <span t-field="book.publisher_id" />-->
+        </div>
+      </t>
+  </div>
+</template>
+
+</odoo>

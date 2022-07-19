@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_report">
+        <t t-call="web.html_container">
+        	<t t-foreach="docs" t-as="o">
+            <t t-call="web.external_layout"> 
+                <div class="page">
+                    <div class="oe_structure"/> 
+                    <div class="row" style="padding-top:30px;">
+                    	<h1>Ventas del Día</h1>
+                    </div>
+                    <div class="row" style="padding-top:50px;">
+                    	<Strong>Periodo:</Strong>
+                        <div style="width: 50%;">
+                            <strong t-esc="o.date_from"/>  al <strong t-esc="o.date_to"/>  
+                        </div>
+                    </div>
+                    <br/><br/>
+                    <div class="row">
+                        <t t-set="lines" t-value="get_lines(o)"/>
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <strong>Folio</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Cliente</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Nombre</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Costo</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Subtotal</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Impuestos</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Contado</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Crédito</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Márgen</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Márgen %</strong>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    <t t-set="tot_costo" t-value="0.0"/>
+                                    <t t-set="tot_untax" t-value="0.0"/>
+                                    <t t-set="tot_tax" t-value="0.0"/>
+                                    <t t-set="tot_credito" t-value="0.0"/>
+                                    <t t-set="tot_contado" t-value="0.0"/>
+                                    <t t-set="tot_margen" t-value="0.0"/>
+                                    <t t-set="tot_pct" t-value="0.0"/>
+                                <t t-foreach="lines[0]" t-as="doc">
+                                    <t t-set="costo_de_ventas" t-value="0.0"/>
+                                    <t t-set="utilidad" t-value="0.0"/>
+                                        <t t-foreach="doc.invoice_line_ids" t-as="line">
+                                            <t t-set="costo_de_ventas" t-value="costo_de_ventas + line.product_id.standard_price * line.quantity"/>
+                                        </t>
+                                        <t t-set="utilidad" t-value="doc.amount_untaxed - costo_de_ventas"/>
+                                    <tr>
+                                        <td>
+                                            <span t-field="doc.name" />
+                                        </td>
+                                        <td>
+                                            <span t-field="doc.partner_id.ref" />
+                                        </td>  
+                                        <td>
+                                            <span t-field="doc.partner_id.name" />
+                                        </td> 
+                                        <td>
+                                            <t t-esc="round(costo_de_ventas,2)" />
+                                            <t t-set="tot_costo" t-value="tot_costo + costo_de_ventas"/>
+                                        </td> 
+                                        <td>
+                                            <span t-field="doc.amount_untaxed" />
+                                            <t t-set="tot_untax" t-value="tot_untax + doc.amount_untaxed"/>
+                                        </td> 
+                                        <td>
+                                            <span t-field="doc.amount_tax" />
+                                            <t t-set="tot_tax" t-value="tot_tax + doc.amount_tax"/>
+                                        </td> 
+                                        <td>
+                                            <t t-if="doc.invoice_payment_term_id.name == 'Pago inmediato'">
+                                               <span t-field="doc.amount_total" />
+                                                <t t-set="tot_contado" t-value="tot_contado + doc.amount_total"/>
+                                            </t>
+                                            <t t-if="doc.invoice_payment_term_id.name != 'Pago inmediato'">
+                                               0
+                                            </t>
+                                        </td> 
+                                        <td>
+                                            <t t-if="doc.invoice_payment_term_id.name == 'Pago inmediato'">
+                                               0
+                                            </t>
+                                            <t t-if="doc.invoice_payment_term_id.name != 'Pago inmediato'">
+                                               <span t-field="doc.amount_total" />
+                                               <t t-set="tot_credito" t-value="tot_credito + doc.amount_total"/>
+                                            </t>
+                                        </td> 
+                                        <td>
+                                            <t t-esc="round(utilidad,2)" />
+                                            <t t-set="tot_margen" t-value="tot_margen + utilidad"/>
+                                        </td> 
+                                        <td>
+                                            <t t-if="utilidad > 0">
+                                               <span t-esc="round(utilidad / doc.amount_untaxed,2)*100" />
+                                            </t>
+                                            <t t-if="utilidad &lt; 0" >
+                                               <span t-esc="round(utilidad / doc.amount_untaxed,2)*100" />
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                                    <tr>
+                                        <td>
+                                            Total facturas
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>
+                                            <span t-esc="round(tot_costo,2)" />
+                                        </td>
+                                        <td>
+                                            <span t-esc="round(tot_untax,2)" />
+                                        </td>
+                                        <td>
+                                            <span t-esc="round(tot_tax,2)" />
+                                        </td>
+                                        <td>
+                                            <span t-esc="round(tot_contado,2)" />
+                                        </td>
+                                        <td>
+                                            <span t-esc="round(tot_credito,2)" />
+                                        </td>
+                                        <td>
+                                            <t t-esc="round(tot_margen,2)" />
+                                        </td>
+                                        <td>
+                                            <span t-set="tot_pct" t-value="round(tot_margen / tot_untax,2)*100" />
+                                            <t t-esc="tot_pct" />
+                                        </td>
+                                    </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+						<div class="col-xs-4 pull-right">
+							<table class="table table-condensed">
+								<tr class="border-black">
+									<td>
+										<strong>Subtotal</strong>
+									</td>
+									<td class="text-right">
+										<span t-esc="lines[1]"
+											t-options='{"widget": "monetary", "display_currency": lines[4]}' />
+									</td>
+								</tr>
+								<t t-foreach="lines[3]" t-as="line">
+										<tr>
+											<td>
+												<span t-esc="line['name']" />
+											</td>
+											<td class="text-right">
+												<span t-esc="line['amount']" />
+											</td>
+										</tr>
+								</t>
+								<tr class="border-black">
+									<td>
+										<strong>Total</strong>
+									</td>
+									<td class="text-right">
+										<span t-esc="lines[2]"
+											t-options='{"widget": "monetary", "display_currency": lines[4]}' />
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+                    </div>
+                    <div class="oe_structure"/>
+                </div>
+            </t>     
+            </t>  
+        </t>
+    </template>
+    
+    <report id="report_invoice_total" 
+    		string="Reporte de Facturas" 
+    		model="xls.invoice.report" 
+    		report_type="qweb-pdf" 
+    		file="reporte_facturas_dassa.report_invoice_report" 
+    		name="reporte_facturas_dassa.report_invoice_report"  
+    		menu="False"/>
+    
+    
+
+</odoo>

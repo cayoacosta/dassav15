@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+            id="comisiones_mecanicos_reports_main"
+            string="comisiones mecanicos  print information"
+            model="ordenes.de.reparacion"
+            report_type="qweb-pdf"
+            file="comisiones_mecanicos.comisiones_mecanicos_reports"
+            name="comisiones_mecanicos.comisiones_mecanicos_reports"
+            menu="False"
+    />
+
+    <template id="comisiones_mecanicos_reports">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <style>
+                        table {
+
+                        border-collapse: collapse;
+                        }
+                        td {
+                        border: none;
+                        class : text-right;
+                        }
+                        th {
+                        class : text-left;
+                        }
+                    </style>
+
+                    <table class="table table-sm" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th style="width:15%">
+                                    <span>Factura</span>
+                                </th>
+                                <th style="width:15%">
+                                    <span>Fecha</span>
+                                </th>
+                                <th style="width:15%">
+                                    <span>Referencia</span>
+                                </th>
+                                <th style="width:15%">
+                                    <span>Descripcion</span>
+                                </th>
+                                <th style="width:15%">
+                                    <span>Importe</span>
+                                </th>
+                                <th style="width:15%">
+                                    <span>Comision</span>
+                                </th>
+                                <th style="width:15%">
+                                    <span>Imp. Req</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <t t-set="total_amount_mano" t-value="0"/>
+                            <t t-set="total_comision" t-value="0"/>
+                            <t t-set="total_amount" t-value="0"/>
+                            <t t-foreach="docs" t-as="o">
+                                <tr t-foreach="o.mano_de_obra_ids" t-as="line">
+                                    <td style="width:15%">
+                                        <span t-field="o.name"/>
+                                    </td>
+                                    <td style="width:15%">
+                                        <span t-field="o.fecha"/>
+                                    </td>
+                                    <td style="width:15%">
+                                        <span t-esc="line.product_id.default_code or ''"/>
+                                    </td>
+                                    <td style="width:15%">
+                                        <span t-esc="line.product_id.name"/>
+                                    </td>
+                                    <td class="text-right" style="width:15%">
+                                        <span t-esc="line.price_subtotal + line.price_tax"/>
+                                    </td>
+                                    <td class="text-right" style="width:15%">
+                                        <span t-field="line.comision"/>
+                                    </td>
+                                    <td class="text-right" style="width:15%">
+                                        <span t-field="o.amount_total_mano"/>
+                                    </td>
+                                    <t t-set="total_amount_mano"
+                                       t-value="total_amount_mano + line.price_subtotal + line.price_tax"/>
+                                    <t t-set="total_comision" t-value="total_comision + line.comision"/>
+                                    <t t-set="total_amount" t-value="total_amount + o.amount_total_mano"/>
+                                </tr>
+                            </t>
+                            <!-- <table style="width:100%"> -->
+                            <tr>
+                                <th colspan="4" style="width:60%">
+                                    <span>Totales del Mecanico 005 Juan CASTROL NOLASCO</span>
+                                </th>
+
+                                <th class="text-right" style="width:15%">
+                                    <span t-esc="round(total_amount_mano,2)"/>
+                                </th>
+                                <th class="text-right" style="width:15%">
+                                    <span t-esc="round(total_comision,2)"/>
+                                </th>
+                                <th class="text-right" style="width:15%">
+                                    <span t-esc="round(total_amount,2)"/>
+                                </th>
+                            </tr>
+
+                            <!-- </table> -->
+                        </tbody>
+
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<odoo>
+    <menuitem id="ubicacion_menu"
+              name="ubicacion" />
+
+    <act_window id="action_ubicacion"
+      name="ubicacion"
+      res_model="ubicacion"
+      view_mode="tree,form"
+    />
+
+    <menuitem id="menu_ubicacion"
+              name="ubicacion"
+              action="action_ubicacion"
+              parent="ubicacion_menu" />
+    />
+
+    <act_window id="action_ubicacion_category"
+      name="ubicacion_category"
+      res_model="ubicacion.category"
+      view_mode="tree,form"
+    />
+
+    <menuitem id="menu_ubicacion_category"
+              name="ubicacion_category"
+              action="action_ubicacion_category"
+              parent="ubicacion_menu" />
+    />
+
+</odoo>

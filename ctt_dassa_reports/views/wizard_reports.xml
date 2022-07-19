@@ -1,0 +1,203 @@
+<odoo>
+    <data>
+        <act_window id="launch_dassa_existencia_ubicacion"
+            name="Reporte existencias (modalidad por ubicación)"
+            res_model="report.existencia_ubicacion"
+            view_mode="form"
+            target="new"
+        />
+        <act_window id="launch_dassa_saldos" 
+            name="Reporte saldos"
+            res_model="report.saldos"
+            view_mode="form"
+            target="new"
+        />
+        <act_window id="launch_dassa_ventas_departamento" 
+            name="Reporte ventas por departamento"
+            res_model="report.ventas_departamento"
+            view_mode="form"
+            target="new"
+        />
+        
+        <act_window id="launch_dassa_exist_ventas" 
+            name="Reporte existencias y ventas"
+            res_model="report.exist_ventas"
+            view_mode="form"
+            target="new"
+        />
+        
+        <record model="ir.ui.view" id="form_dassa_existencia_ubicacion_view">
+            <field name="name">Wizard existencia ubicacion</field>
+            <field name="model">report.existencia_ubicacion</field>
+            <field name="arch" type="xml">
+                <form string="Add Attendees">
+                    <div class="oe_avatar">
+                        <label for="warehouse_id" string="Almacén"/>
+                        <field name="warehouse_id" string="Almacén"/><br/>
+                        <label for="date" string="Fecha"/>
+                        <field name="date" string="Fecha"/>
+                    </div>
+                    <div class="oe_title">
+                        <group>
+                            <field name="desc" string="Descripción"/>
+                        </group>
+                        <group string="Criterio de selección de productos">
+                            <field name="category_ids" widget="many2many_tags"/>
+                            <field name="mueble" placeholder="(Todos)"/>
+                            <field name="fila" placeholder="(Todos)"/>
+                            <field name="columna" placeholder="(Todos)"/>
+                            <field name="inc_solo_prod_saldo" force_save="1"/>
+                        </group>
+                    </div>
+                    
+                    <footer>
+                        <button name="print_report"
+                            string="IMPRIMIR" type="object"
+                            class="btn-primary oe_highlight"/>
+                        <button string="CERRAR"
+                            class="btn-default"
+                            special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        
+        <record model="ir.ui.view" id="form_dassa_saldos_view">
+            <field name="name">Wizard saldos</field>
+            <field name="model">report.saldos</field>
+            <field name="arch" type="xml">
+                <form string="Add Attendees">
+                    <group string="Criterio de selección de almacenes">
+                        <field name="warehouse_ids" widget="many2many_tags" />
+                    </group>
+                    <group string="Criterio de selección de productos">
+                        <field name="product_ids" widget="many2many_tags" />
+                        <field name="agrupation" attrs="{'invisible':[('product_ids','!=',[])],'required':[('product_ids','=',[])]}"/>
+                        <field name="brand_ids" attrs="{'invisible':['|',('agrupation','!=','brand'),('product_ids','!=',[])]}" widget="many2many_tags"/>
+                        <field name="category_ids"  attrs="{'invisible':['|',('agrupation','!=','line'),('product_ids','!=',[])]}" widget="many2many_tags"/>
+                    </group>
+                    <group string="Rango de fechas">
+                        <group>
+                            <label for="begin_date" string="Fecha del"/>
+                            <field name="begin_date" placeholder="Fecha de inicio" nolabel="1"/>
+                            <label for="end_date" string="Al"/>
+                            <field name="end_date" placeholder="Fecha de terminación" nolabel="1"/>
+                        </group>
+                        
+                    </group>
+                            
+                    <group>
+                        <group>
+                            <field name="inc_prod_baja" attrs="{'readonly':[('product_ids','!=',[])]}" force_save="1"/>
+                            <field name="inc_prod_mov_saldo" attrs="{'readonly':['|',('product_ids','!=',[]),('inc_solo_prod_mov','=',True)]}" force_save="1"/>
+                            <field name="inc_prod_saldo_neg" attrs="{'readonly':[('product_ids','!=',[])]}" force_save="1"/>
+                        </group>
+                        <group>
+                            <field name="inc_solo_prod_mov" attrs="{'readonly':['|',('product_ids','!=',[]),('inc_prod_mov_saldo','=',True)]}" force_save="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="print_report"
+                            string="IMPRIMIR" type="object"
+                            class="btn-primary oe_highlight"/>
+                        <button string="CERRAR"
+                            class="btn-default"
+                            special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        
+        <record model="ir.ui.view" id="form_dassa_ventas_departamento_view">
+            <field name="name">Wizard ventas por departamento</field>
+            <field name="model">report.ventas_departamento</field>
+            <field name="arch" type="xml">
+                <form string="Add Attendees">
+                    <div class="oe_avatar">
+                        <label for="date" string="Fecha al"/>
+                        <field name="date" string="Fecha al"/><br/>
+                        <label for="sucursal" string="Sucursal"/>
+                        <field name="sucursal" string="Sucursal"/>
+                    </div>
+                    <group string="Criterio de selección">
+                        <group>
+                            <field name="journal_ids" widget="many2many_tags"/>
+                        </group>
+                        
+                    </group>
+                    <footer>
+                        <button name="print_report"
+                            string="IMPRIMIR" type="object"
+                            class="btn-primary oe_highlight"/>
+                        <button string="CERRAR"
+                            class="btn-default"
+                            special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="form_dassa_existencias_ventas_view">
+            <field name="name">Wizard existencias y ventas</field>
+            <field name="model">report.exist_ventas</field>
+            <field name="arch" type="xml">
+                <form string="Add Attendees">
+                    <div class="oe_avatar">
+                        <label for="sucursal" string="Sucursal"/>
+                        <field name="sucursal" string="Sucursal"/><br/>
+                        <label for="warehouse_ids" string="Almacenes"/>
+                        <field name="warehouse_ids" string="Almacén" widget="many2many_tags"/><br/>
+                    </div>
+                    
+                        <group string="Criterio de selección de productos">
+                            <field name="product_ids" widget="many2many_tags"/>
+                            <field name="agrupation" attrs="{'invisible':[('product_ids','!=',[])],'required':[('product_ids','=',[])]}"/>
+                            <field name="brand_ids" attrs="{'invisible':['|',('agrupation','!=','brand'),('product_ids','!=',[])]}" widget="many2many_tags"/>
+                            <field name="category_ids"  attrs="{'invisible':['|',('agrupation','!=','line'),('product_ids','!=',[])]}" widget="many2many_tags"/>
+                        </group>
+                        
+                        <group string="Rango de fechas">
+                            <group>
+                                <label for="begin_month" string="Rango de"/>
+                                <field name="begin_month" placeholder="Mes" nolabel="1"/>
+                            </group>
+                            <group>
+                                <field name="begin_year" placeholder="Año" nolabel="1"/>
+                            </group>
+                            <group>
+                                <label for="end_month" string="A"/>
+                                <field name="end_month" placeholder="Mes" nolabel="1"/>
+                            </group>
+                            <group>
+                                <field name="end_year" placeholder="Año" nolabel="1"/>
+                            </group>
+                        </group>
+
+
+                        <group>
+                            <group>
+                                <field name="exedentes_ok"/>
+                                <field name="no_exedentes_ok"/>
+                                <field name="inc_solo_prod_saldo"/>
+                            </group>
+                            <group>
+                                <field name="month_sales"/>
+                            </group>
+                        </group>
+                    
+                    <footer>
+                        <button name="print_report"
+                            string="IMPRIMIR" type="object"
+                            class="btn-primary oe_highlight"/>
+                        <button string="CERRAR"
+                            class="btn-default"
+                            special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

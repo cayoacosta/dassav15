@@ -1,0 +1,35 @@
+<odoo>
+
+<report id="action_ubicacion_sql_report"
+        string="ubicacion SQL Report"
+        model="ubicacion.report"
+        report_type="qweb-html"
+        name="ubicacion_app.report_ubicacion_sql"
+/>
+
+<template id="report_ubicacion_sql">
+  <t t-call="web.html_container">
+    <t t-call="web.external_layout">
+      <div class="page">
+
+        <!-- Report page content -->
+        <table class="table table-striped">
+          <tr>
+            <th>name</th>
+            <th>product_id</th>
+          </tr>
+          <t t-foreach="docs" t-as="o">
+            <tr>
+              <td class="col-xs-6">
+                <span t-field="o.name" />
+              </td>
+            </tr>
+          </t>
+        </table>
+
+      </div>
+    </t>
+  </t>
+</template>
+
+</odoo>

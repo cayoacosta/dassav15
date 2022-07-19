@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_report_comun_data_product_selection,access.report.comun_data_product_selection,model_report_comun_data_product_selection,,1,1,1,1
+access_report_comun_data_almacen_selection,access.report.comun_data_almacen_selection,model_report_comun_data_almacen_selection,,1,1,1,1
+access_report_existencia_ubicacion,access.report.existencia_ubicacion,model_report_existencia_ubicacion,,1,1,1,1
+access_report_existencia_ubicacion_lines,access.report.existencia_ubicacion_lines,model_report_existencia_ubicacion_lines,,1,1,1,1
+access_report_saldos,access.report.saldos,model_report_saldos,,1,1,1,1
+access_report_saldos_lines,access.report.saldos_lines,model_report_saldos_lines,,1,1,1,1
+access_report_ventas_departamento,access.report.ventas_departamento,model_report_ventas_departamento,,1,1,1,1
+access_report_ventas_departamento_lines,access.report.ventas_departamento_lines,model_report_ventas_departamento_lines,,1,1,1,1
+access_report_ventas_departamento_verificator_lines,access.report.ventas_departamento_verificator_lines,model_report_ventas_departamento_verificator_lines,,1,1,1,1
+access_report_exist_ventas,access.report.exist_ventas,model_report_exist_ventas,,1,1,1,1
+access_report_report_exist_ventas_lines,access.report.exist_ventas_lines,model_report_exist_ventas_lines,,1,1,1,1

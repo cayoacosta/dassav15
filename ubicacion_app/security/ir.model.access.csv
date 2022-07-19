@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_book_user,ubicacion User Access,model_ubicacion,ubicacion_group_user,1,0,0,0
+access_book_manager,ubicacion Manager Access,model_ubicacion,ubicacion_group_manager,1,1,1,1
+access_categ_user,Category User Access,model_ubicacion_category,ubicacion_group_user,1,0,0,0
+access_categ_manager,Category Manager Access,model_ubicacion_category,ubicacion_group_manager,1,1,1,1
+

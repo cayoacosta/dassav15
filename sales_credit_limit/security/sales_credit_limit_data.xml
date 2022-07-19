@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="group_ignore_credit_limit" model="res.groups">
+            <field name="name">Sales: Obviar Restricciones de Crédito</field>
+            <field name="comment">Permitir vender con restricciones de Crédito.</field>
+        </record>
+
+</odoo>

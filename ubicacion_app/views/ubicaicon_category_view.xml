@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<odoo>
+
+  <!--<record id="view_form_categ" model="ir.ui.view">
+    <field name="name">Ubicacion Category Form</field>
+    <field name="model">ubicacion.category</field>
+    <field name="arch" type="xml">
+        <form>
+          <group>
+            <field name="name" />
+            <field name="parent_id" />
+          </group>
+      </form>
+    </field>
+  </record>-->
+
+</odoo>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<menuitem id="menu_main_report_taller_itadmin" name="Reports" parent="taller.menu_root_taller_itadmin"  />
+</odoo>

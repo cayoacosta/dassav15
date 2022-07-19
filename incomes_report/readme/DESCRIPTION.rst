@@ -1,0 +1,1 @@
+This report shows the daily account operations for incomes in a defined time period.

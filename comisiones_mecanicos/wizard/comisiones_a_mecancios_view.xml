@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>	
+	<record id="view_taller_comisionesa_mecancios" model="ir.ui.view">
+	   <field name="name">Reporte de Comisiones</field>
+	   <field name="model">comisiones.a.mecancios</field>
+	   <field name="arch" type="xml">
+        <form string="Wizard">
+             <group  string="Comisiones a mecancios">
+                 <group>
+                 	<field name="date_start" widget="date" t-options="{'format': 'DD/MM/yyyy'}" />
+                 </group>
+                 <group>
+                 	<field name="date_end" widget="date" t-options="{'format': 'DD/MM/yyyy'}" />
+                 </group>
+                 
+             </group>         
+             <footer>
+                 <button name="print_report" type="object" string="Create PDF" class="btn-primary"/>
+                 <button string="Cancelar" class="btn-default" special="cancel"/>
+             </footer>
+        </form>
+    	</field>
+   </record>
+   
+   
+   
+   <record id="view_comisiones_a_mecancios_tree" model="ir.ui.view">
+            <field name="name">comisiones.a.mecancios</field>
+            <field name="model">comisiones.a.mecancios</field>
+            <field name="arch" type="xml">
+                <tree string="Journals">
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                    
+                </tree>
+            </field>
+      </record>
+   
+   
+      <record id="taller_comisiones_a_mecancios_action_wizard" model="ir.actions.act_window">
+	    <field name="name">Reporte de Comisiones</field>
+	    <field name="res_model">comisiones.a.mecancios</field>
+	    <field name="view_mode">form</field>
+	    <field name="view_id" ref="view_taller_comisionesa_mecancios"/>
+	    <field name="target">new</field>
+	</record>   
+      <menuitem id="menu_taller_sub_report_sub"  action ="taller_comisiones_a_mecancios_action_wizard" name="Comisiones a mecáncios" parent="menu_main_report_taller_itadmin" sequence="1" />
+</odoo>

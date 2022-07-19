@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<report
+			   id="dassa_reports"
+			   string="Poliza de chequs"
+			   model="account.payment"
+			   report_type="qweb-pdf"
+			   file="dassa_reports.dassa_report"
+			   name="dassa_reports.dassa_report"
+			  />
+			  
+	<report
+			   id="dassa_poliza_de_diario_report"
+			   string="Poliza de diario"
+			   model="account.move"
+			   report_type="qweb-pdf"
+			   file="dassa_reports.dassa_poliza_de_report"
+			   name="dassa_reports.dassa_poliza_de_report"
+			  />		  
+</odoo>

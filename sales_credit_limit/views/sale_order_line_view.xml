@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<odoo>
+   <!-- <record id="view_order_form_markup model" model="ir.ui.view">
+        <field name="name">sale.order.form.markup</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr='//field[@name="order_line"]/form/group/group/field[@name="price_unit"]' position="before">
+                <label for="markup" string="Markup"/><field name="markup"/>
+                <label for="markup_per" string="Markup (%)"/><field name="markup_per"/>
+            </xpath>
+            <xpath expr='//field[@name="order_line"]/tree/field[@name="price_unit"]' position="before">
+                <field name="markup" string="Markup"/>
+                <field name="markup_per" string="Markup (%)"/>
+            </xpath>
+        </field>
+    </record>-->
+</odoo>

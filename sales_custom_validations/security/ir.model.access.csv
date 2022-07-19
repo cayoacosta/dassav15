@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sales_custom_validations_sales_custom_validations,sales_custom_validations.sales_custom_validations,model_sales_custom_validations_sales_custom_validations,,1,0,0,0

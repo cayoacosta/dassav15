@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<odoo>
+
+<record id="paperformat_euro_landscape"
+        model="report.paperformat">
+  <field name="name">European A4 Landscape</field>
+  <field name="default" eval="True" />
+  <field name="format">A4</field>
+  <field name="page_height">0</field>
+  <field name="page_width">0</field>
+  <field name="orientation">Landscape</field>
+  <field name="margin_top">40</field>
+  <field name="margin_bottom">23</field>
+  <field name="margin_left">7</field>
+  <field name="margin_right">7</field>
+  <field name="header_line" eval="False" />
+  <field name="header_spacing">35</field>
+  <field name="dpi">90</field>
+</record>
+
+<report id="action_ubicacion_report"
+  string="ubicacion"
+  model="ubicacion" report_type="qweb-pdf"
+  name="ubicacion_app.report_ubicacion_template"
+  paperformat="paperformat_euro_landscape"
+ />
+
+<template id="report_ubicacion_template">
+  <t t-call="web.html_container">
+    <t t-call="web.external_layout">
+      <div class="page">
+
+        <!-- Report header content -->
+        <div class="container">
+        <div class="row bg-primary">
+            <div class="col-3">Product_id</div>
+        </div>
+
+        <!-- Running total: initialize variable -->
+        <!--<t t-set="ss_count" t-value="0" />-->
+
+        <t t-foreach="docs" t-as="o">
+            <div class="row">
+                <!-- Report Row Content -->
+                <div class="col-3">
+                    <h4><span t-field="o.name" /></h4>
+
+                    <!-- Running total: increment and present -->
+                    <t t-set="ss_count"
+                    t-value="ss_count + len(o.fila)" />
+                    (Accum. sss: <t t-esc="ss_count" />)
+
+                </div>
+                <div class="col-2">
+                <span t-field="o.product_id" />
+                </div>
+                <div class="col-2">
+                <span t-field="o.location_id"
+                        t-options="{'widget': 'date'}" />
+                </div>
+                <div class="col-3">
+                <div t-field="o.product_id"
+                    t-options='{
+                        "widget": "contact",
+                        "fields": ["address", "email", "phone", "website"],
+                        "no_marker": true}' />
+                </div>
+                <div class="col-2">
+                    <!-- Render sss -->
+                    <ul class="list-unstyled">
+                    <t t-foreach="o.fila" t-as="ss">
+                      <li class="media">
+                        <span t-field="ss.image_small"
+                              t-options="{'widget': 'image'}" />
+                        <div class="media-body">
+                          <p class="mt-0">
+                            <span  t-field="ss.name" />
+                          </p>
+                        </div>
+                        <p/>
+                      </li>
+                    </t>
+                    </ul>
+
+                </div>
+
+            </div>
+        </t>
+
+        <!-- Report footer content ...-->
+        <div class="row">
+            <div class="col-3">
+                Count: <t t-esc="len(docs)" />
+                Price: <t t-esc="sum([x.price for x in docs])" />
+            </div>
+            <div class="col-2" />
+            <div class="col-2" />
+            <div class="col-3" />
+            <div class="col-2" />
+            </div>
+        </div>
+
+      </div>
+    </t>
+  </t>
+</template>
+
+</odoo>

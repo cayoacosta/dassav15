@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="header_view" model="ir.ui.view">
+            <field name="name">Credit  Limit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='payment_term_id']" position="after">
+                    <field name="has_due"/>
+                    <field name="is_warning"/>
+                    <field name="is_defaulter"/>
+                </xpath>
+                <xpath expr="//header" position="after">
+                    <div class="alert alert-info" role="alert" style="height: 40px; margin-bottom:0px;" attrs="{'invisible':[('has_due','=',False)]}">
+                        Este cliente tiene un saldo de <strong><field name="due_amount"/></strong>.
+                    </div>
+                </xpath>
+                <xpath expr="//header" position="after">
+                    <div class="alert alert-danger" style="height: 40px; margin-bottom:0px;" attrs="{'invisible':[('is_warning','=',False)]}">
+                        Este cliente pronto alcanzará su <strong>límite de crédito.</strong> (<field name="credit_limit"/>).
+                    </div>
+                </xpath>
+                <xpath expr="//header" position="after">
+                    <div class="alert alert-danger" style="height: 40px; margin-bottom:0px;" attrs="{'invisible':[('is_defaulter','=',False)]}">
+                        Este cliente tiene facturas vencidas.
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,67 @@
+<odoo>
+    <record id="tecnika_incomes_report_tree_view" model="ir.ui.view">
+        <field name="name">tecnika.incomes.report.tree.view</field>
+        <field name="model">tecnika.incomes.report</field>
+        <field name="arch" type="xml">
+            <tree string="Incomes Report" default_order='operation_type, operating_unit_id, date'>
+                <field name="operating_unit_id"/>
+                <field name="operation_type"/>
+                <field name="date"/>
+                <field name="journal_id"/>
+                <field name="invoice_id"/>
+                <field name="payment_id"/>
+                <field name="partner_id"/>
+                <field name="cash_amount"/>
+                <field name="cash_tax_amount"/>
+                <field name="credit_amount"/>
+                <field name="credit_tax_amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="tecnika_incomes_report_search_view" model="ir.ui.view">   
+        <field name="name">tecnika.incomes.report.search.view</field>   
+        <field name="model">tecnika.incomes.report</field>   
+        <field name="arch" type="xml">       
+            <search string="Incomes Report">           
+                <filter name="group_ou_id" string="Operating Unit" icon="terp-partner" context="{'group_by':'operating_unit_id'}"/> 
+                <filter name="group_operation_type" string="Operation Type" context="{'group_by':'operation_type'}"/> 
+                <filter name="group_date" string="Date" context="{'group_by':'date:day'}"/>
+                <filter name="group_journal" string="Journal" context="{'group_by': 'journal_id'}"/> 
+            </search>   
+        </field>
+    </record>
+
+    <record id="tecnika_incomes_reportbydoc_tree_view" model="ir.ui.view">
+        <field name="name">tecnika.incomes.reportbydoc.tree.view</field>
+        <field name="model">tecnika.incomes.reportbydoc</field>
+        <field name="arch" type="xml">
+            <tree string="Incomes Report" default_order='doctype, operating_unit_id, date'>
+                <field name="operating_unit_id"/>
+                <field name="doctype"/>
+                <field name="date"/>
+                <field name="operation_type"/>
+                <field name="journal_id"/>
+                <field name="invoice_id"/>
+                <field name="payment_id"/>
+                <field name="partner_id"/>
+                <field name="amount_total"/>
+                <field name="amount_tax"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="tecnika_incomes_reportbydoc_search_view" model="ir.ui.view">   
+        <field name="name">tecnika.incomes.reportbydoc.search.view</field>   
+        <field name="model">tecnika.incomes.reportbydoc</field>   
+        <field name="arch" type="xml">       
+            <search string="Incomes Report By Document">           
+                <filter name="group_ou_id" string="Operating Unit" icon="terp-partner" context="{'group_by':'operating_unit_id'}"/> 
+                <filter name="group_operation_type" string="Document Type" context="{'group_by':'doctype'}"/> 
+                <filter name="group_date" string="Date" context="{'group_by':'date:day'}"/>
+                <filter name="group_journal" string="Journal" context="{'group_by': 'journal_id'}"/> 
+            </search>   
+        </field>
+    </record>
+
+</odoo>

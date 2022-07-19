@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+       <!--<data>
+            <record id="view_account_invoice_refund_inherit" model="ir.ui.view">
+                <field name="name">acconut.invoice.refund.inherit</field>
+                <field name="model">account.invoice.refund</field>
+                <field name="inherit_id" ref="account.view_account_invoice_refund"/>
+                <field name="arch" type="xml">
+                    <field name="description" position="after">
+                        <field name="nota_dev"/>
+                        <field name="tipo"/>
+                        <field name="account_id"/>
+                        <field name="journal_id"/>
+                    </field>
+                </field>
+            </record>
+        </data>-->
+</odoo>

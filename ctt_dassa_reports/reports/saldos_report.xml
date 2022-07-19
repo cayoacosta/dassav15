@@ -1,0 +1,673 @@
+<odoo>
+    <data>
+        <report id="ctt_dassa_reports_saldos_report"
+                model="report.saldos"
+                string="Reporte de saldos"
+                report_type="qweb-pdf"
+                name="ctt_dassa_reports.saldos"
+                file="ctt_dassa_reports.saldos_report"
+                attachment_use="True"
+                print_report_name="('REPORTE DE SALDOS')"
+                paperformat="ctt_dassa_reports.paperformat_carta_landscape" 
+                
+                />
+        
+        <template id="saldos">
+            <t t-call="web.html_container">
+                <t t-call="ctt_dassa_reports.external_layout_saldo_dassa">
+                    <t t-foreach="docs" t-as="doc">
+                        <t t-set="sum_total_balance_prev_unids" t-value="0"/>
+                        <t t-set="sum_total_balance_prev_values" t-value="0"/>
+                        <t t-set="sum_total_entr_unids" t-value="0"/>
+                        <t t-set="sum_total_entr_values" t-value="0"/>
+                        <t t-set="sum_total_out_unids" t-value="0"/>
+                        <t t-set="sum_total_out_values" t-value="0"/>
+                        <t t-set="sum_total_balance_act_unids" t-value="0"/>
+                        <t t-set="sum_total_balance_act_values" t-value="0"/>
+                        <t t-set="sum_total_reserved_quants" t-value="0"/>
+                        <div class="page">
+                            <strong><div>Filtros aplicados</div></strong>
+                            <div style="float:left;width:33%;">
+                                        Almacén: <t t-if="len(doc.warehouse_ids)==0">Todos</t><t t-else=""> Selecciono <t t-esc="len(doc.warehouse_ids)"/> almacenes</t>
+                                        <div>
+                                            Productos: 
+                                            <t t-if="len(doc.product_ids)==0">
+                                                Todos
+                                            </t>
+                                            <t t-else="">
+                                                Selecciono <t t-esc="len(doc.product_ids)"/> productos
+                                            </t>
+                                        </div>
+                                    </div>
+                                    <div style="float:left;width:33%;">
+                                        <div>
+                                            Rango de fechas:
+                                            <div>
+                                                del <t t-esc="doc.date_begin_char"/>
+                                            </div>
+                                            <div>
+                                                al <t t-esc="doc.date_end_char"/>
+                                            </div>
+                                            
+                                        </div>
+                                        <div>
+                                            <t t-if="len(doc.product_ids)==0">
+                                                Agrupación: <t t-esc="doc.agrupation"/>
+                                            </t>
+                                        </div>
+                                        <div>
+                                            <t t-if="len(doc.agrupation)=='line' and len(doc.product_ids)>0">
+                                                Selecciono: <t t-esc="len(doc.category_ids)"/> categorias
+                                            </t>
+                                            <t t-elif="len(doc.agrupation)=='brand' and len(doc.product_ids)>0">
+                                                Selecciono: <t t-esc="len(doc.brand_ids)"/> marcas
+                                            </t>
+                                        </div>
+                                    </div>
+                                    <div style="float:left;width:33%;">
+                                        <div>
+                                            Incluir productos dados de baja: <t t-if="doc.inc_prod_baja==True">Activado</t><t t-else="">No activado</t>
+                                        </div>
+                                        <div>
+                                            Incluir productos con movimientos o saldo: <t t-if="doc.inc_prod_mov_saldo==True">Activado</t><t t-else="">No activado</t>
+                                        </div>
+                                        <div>
+                                            Incluir productos con saldo negativo: <t t-if="doc.inc_prod_saldo_neg==True">Activado</t><t t-else="">No activado</t>
+                                        </div>
+                                        <div>
+                                            Incluir productos solo con movimiento: <t t-if="doc.inc_solo_prod_mov==True">Activado</t><t t-else="">No activado</t>
+                                        </div>
+                            </div>
+                            <div style="clear: both">
+                                <h2>Reporte de SALDOS</h2>
+                            </div>
+                            <table style="width:100%; border-collapse: collapse;margin:0;border-spacing: 0; margin-top: 0;page-break-after:always;"  cellpadding="0" cellspacing="0">
+                                <thead style="display:table-header-group;font-size:11px">
+                                    <tr style="width:100%;">
+                                        <th style="width:5%;">
+                                            <div>Producto</div>
+                                        </th>
+                                        <th style="width:15%;">
+                                            <div>Descripción</div>
+                                        </th>
+                                        <th colspan="2" style="width:20%;">
+                                            <div>Saldo anterior</div>
+                                        </th>
+                                        <th colspan="2" style="width:20%;">
+                                            <div>Entradas</div>
+                                        </th>
+                                        <th colspan="2" style="width:20%;">
+                                            <div>Salidas</div>
+                                        </th>
+                                        <th colspan="2" style="width:25%;">
+                                            <div>Saldo actual</div>
+                                        </th>
+                                    </tr>
+                                    <tr style="width:100%">
+                                        <th style="width:5%;"></th>
+                                        <th style=""></th>
+                                        <th style=""><div>Unidades</div></th>
+                                        <th style=""><div>Valor</div></th>
+
+                                        <th style=""><div>Unidades</div></th>
+                                        <th style=""><div>Valor</div></th>
+
+                                        <th style=""><div>Unidades</div></th>
+                                        <th style=""><div>Valor</div></th>
+
+                                        <th style=""><div>Unidades</div></th>
+                                        <th style=""><div>Valor</div></th>
+                                        
+                                        <th style=""><div>Reservados</div></th>
+                                    </tr>
+                                </thead>
+                                <t t-set="old_sucursal" t-value="0"/>
+                                <t t-set="old_sucursal_name" t-value="0"/>
+                                <t t-set="old_warehouse" t-value="0"/>
+                                <t t-set="old_warehouse_name" t-value="0"/>
+                                <t t-set="old_location" t-value="0"/>
+                                <t t-set="old_location_name" t-value="0"/>
+                                    <t t-foreach="doc.saldos_lines" t-as="line">
+                                        <t t-if="line.type=='d'">
+                                            <t t-set="new_sucursal" t-value="line.sucursal.id"/>
+                                            <t t-set="new_warehouse" t-value="line.warehouse_id.id"/>
+                                            <t t-set="new_location" t-value="line.location_id.id"/>
+                                            
+                                            <!-- CONDICIONES PARA SABER SI PONER EL TOTAL POR ALMACEN, LOCACION Y SUCURSAL -->
+                                            <!-- SI HAY UN CAMBIO EN LA SUCURSAL-->
+                                            <t t-if="old_sucursal!=0 and new_sucursal!=old_sucursal">
+                                                <!-- INSERCION LOCACION -->
+                                                <t t-foreach="doc.saldos_lines" t-as="line_suc">
+                                                    <t t-if="line_suc.type=='l'">
+                                                        <t t-if="line_suc.location_id.id==old_location">
+                                                            <tr style="font-size:11px">
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top" colspan="2">
+                                                                    <strong>Resumen de locación:</strong> <t t-esc="old_location_name"/>
+                                                                </td>
+                                                                
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.entr_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.entr_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.out_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.out_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_act_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_act_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.reserved_quants)"/>
+                                                                </td>
+                                                            </tr>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                                <!-- INSERCION ALMACEN -->
+                                                <t t-foreach="doc.saldos_lines" t-as="line_suc">
+                                                    <t t-if="line_suc.type=='w'">
+                                                        <t t-if="line_suc.warehouse_id.id==old_warehouse">
+                                                            <tr style="font-size:11px">
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top" colspan="2">
+                                                                    <strong>Resumen de almacén:</strong> <t t-esc="old_warehouse_name"/>
+                                                                </td>
+                                                                
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.entr_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.entr_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.out_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.out_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_act_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_act_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.reserved_quants)"/>
+                                                                </td>
+                                                                
+                                                                <t t-set="sum_total_balance_prev_unids" t-value="sum_total_balance_prev_unids+ line_suc.balance_prev_unids"/>
+                                                                <t t-set="sum_total_balance_prev_values" t-value="sum_total_balance_prev_values + line_suc.balance_prev_values"/>
+                                                                <t t-set="sum_total_entr_unids" t-value="sum_total_entr_unids + line_suc.entr_unids"/>
+                                                                <t t-set="sum_total_entr_values" t-value="sum_total_entr_values + line_suc.entr_values"/>
+                                                                <t t-set="sum_total_out_unids" t-value="sum_total_out_unids + line_suc.out_unids"/>
+                                                                <t t-set="sum_total_out_values" t-value="sum_total_out_values + line_suc.out_values"/>
+                                                                <t t-set="sum_total_balance_act_unids" t-value="sum_total_balance_act_unids + line_suc.balance_act_unids"/>
+                                                                <t t-set="sum_total_balance_act_values" t-value="sum_total_balance_act_values + line_suc.balance_act_values"/>
+                                                                <t t-set="sum_total_reserved_quants" t-value="sum_total_reserved_quants + line_suc.reserved_quants"/>
+                                                            </tr>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                                <!-- INSERCION SUCURSAL -->
+                                                <t t-foreach="doc.saldos_lines" t-as="line_suc">
+                                                    <t t-if="line_suc.type=='s'">
+                                                        <t t-if="line_suc.sucursal.id==old_sucursal">
+                                                            <tr style="font-size:11px">
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top" colspan="2">
+                                                                    <strong>Resumen de sucursal:</strong> <t t-esc="old_sucursal_name"/>
+                                                                </td>
+                                                                
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.entr_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.entr_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.out_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.out_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_act_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_act_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.reserved_quants)"/>
+                                                                </td>
+                                                            </tr>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                            <t t-elif="old_warehouse!=0 and new_warehouse!=old_warehouse">
+                                                <!-- INSERCION DE LOCACION -->
+                                                <t t-foreach="doc.saldos_lines" t-as="line_suc">
+                                                    <t t-if="line_suc.type=='l'">
+                                                        <t t-if="line_suc.location_id.id==old_location">
+                                                            <tr style="font-size:11px">
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top" colspan="2">
+                                                                    <strong>Resumen de locación:</strong> <t t-esc="old_location_name"/>
+                                                                </td>
+                                                                
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.entr_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.entr_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.out_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.out_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_act_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_act_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.reserved_quants)"/>
+                                                                </td>
+                                                            </tr>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                                <!-- INSERCION DE ALMACEN -->
+                                                <t t-foreach="doc.saldos_lines" t-as="line_suc">
+                                                    <t t-if="line_suc.type=='w'">
+                                                        <t t-if="line_suc.warehouse_id.id==old_warehouse">
+                                                            <tr style="font-size:11px">
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top" colspan="2">
+                                                                    <strong>Resumen de Almacén:</strong> <t t-esc="old_warehouse_name"/>
+                                                                </td>
+                                                                
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.entr_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.entr_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.out_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.out_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_act_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_act_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.reserved_quants)"/>
+                                                                </td>
+                                                                <t t-set="sum_total_balance_prev_unids" t-value="sum_total_balance_prev_unids+ line_suc.balance_prev_unids"/>
+                                                                <t t-set="sum_total_balance_prev_values" t-value="sum_total_balance_prev_values + line_suc.balance_prev_values"/>
+                                                                <t t-set="sum_total_entr_unids" t-value="sum_total_entr_unids + line_suc.entr_unids"/>
+                                                                <t t-set="sum_total_entr_values" t-value="sum_total_entr_values + line_suc.entr_values"/>
+                                                                <t t-set="sum_total_out_unids" t-value="sum_total_out_unids + line_suc.out_unids"/>
+                                                                <t t-set="sum_total_out_values" t-value="sum_total_out_values + line_suc.out_values"/>
+                                                                <t t-set="sum_total_balance_act_unids" t-value="sum_total_balance_act_unids + line_suc.balance_act_unids"/>
+                                                                <t t-set="sum_total_balance_act_values" t-value="sum_total_balance_act_values + line_suc.balance_act_values"/>
+                                                                <t t-set="sum_total_reserved_quants" t-value="sum_total_reserved_quants + line_suc.reserved_quants"/>
+                                                            </tr>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                            <t t-elif="old_location!=0 and new_location!=old_location">
+                                                <t t-foreach="doc.saldos_lines" t-as="line_suc">
+                                                    <t t-if="line_suc.type=='l'">
+                                                        <t t-if="line_suc.location_id.id==old_location">
+<!--                                                             <tr style="font-size:11px">
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top" colspan="2">
+                                                                    <strong>Resumen de locación:</strong> <t t-esc="old_location_name"/>
+                                                                </td>
+                                                                
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.entr_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.entr_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.out_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.out_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.balance_act_unids)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    $<t t-esc="'{0:,.2f}'.format(line_suc.balance_act_values)"/>
+                                                                </td>
+                                                                <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                                    <t t-esc="'{0:,.2f}'.format(line_suc.reserved_quants)"/>
+                                                                </td>
+                                                            </tr> -->
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                            
+                                            
+                                            
+                                            
+                                            <!-- PONIENDO LOS ENCABEZADOS-->
+                                            <t t-if="old_sucursal==0 or new_sucursal!=old_sucursal">
+                                                <tr style="padding: 0; margin: 0;padding-top: 0;font-size:11px">
+                                                    <td colspan="10" style="padding: 0px;">
+                                                        <strong>Sucursal:</strong> <t t-esc="line.sucursal.name"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="old_warehouse==0 or new_warehouse!=old_warehouse">
+                                                <tr style="padding: 0;margin: 0;padding-top: 0;font-size:11px">
+                                                    <td colspan="10" style="padding: 0px;">
+                                                        <div style="margin-left:40px">
+                                                            <strong>Almacén:</strong> <t t-esc="line.warehouse_id.name"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </t>
+<!--                                             <t t-if="old_location==0 or new_location!=old_location">
+                                                <tr style="padding: 0;margin: 0;padding-top: 0;font-size:11px">
+                                                    <td colspan="10" style="padding: 0px;">
+                                                        <div style="margin-left:40px">
+                                                           <strong>Locación:</strong> <t t-esc="line.location_id.name"/>
+                                                        </div>
+                                                    </td>
+                                                </tr> -->
+                                            <!-- INGRESANDO LAS FILAS CORRESPONDIENTES -->
+<!--                                             </t> -->
+                                                <tr style="font-size:11px">
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top;">
+                                                        <t t-esc="line.product_id.default_code"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="line.product_id.name"/>
+                                                    </td>
+                                                    
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line.balance_prev_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line.balance_prev_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line.entr_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line.entr_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line.out_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line.out_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line.balance_act_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line.balance_act_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line.reserved_quants)"/>
+                                                    </td>
+                                                </tr>
+                                            
+                                            
+                                            
+                                                <!-- VALROES ANTERIORES -->
+                                                <t t-set="old_sucursal" t-value="line.sucursal.id"/>
+                                                <t t-set="old_sucursal_name" t-value="line.sucursal.name"/>
+                                                <t t-set="old_warehouse" t-value="line.warehouse_id.id"/>
+                                                <t t-set="old_warehouse_name" t-value="line.warehouse_id.name"/> 
+                                                <t t-set="old_location" t-value="line.location_id.id"/>
+                                                <t t-set="old_location_name" t-value="line.location_id.name"/>
+                                        </t>
+                                        
+                                    </t>
+                                
+                                    
+                                
+                                
+                                
+                                
+                                    
+                                    <!-- DATOS DEL ULTIMO DATO -->
+                                    <t t-foreach="doc.saldos_lines" t-as="line_suc">
+                                        <t t-if="line_suc.type=='l'">
+                                            <t t-if="line_suc.location_id.id==old_location">
+                                                <tr style="font-size:11px">
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top" colspan="2">
+                                                        <div>
+                                                            <strong>Resumen de Locacion:</strong> <t t-esc="old_location_name"/>
+                                                        </div>
+                                                    </td>
+
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.entr_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.entr_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.out_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.out_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.balance_act_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.balance_act_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.reserved_quants)"/>
+                                                    </td>
+                                                </tr>
+
+                                            </t>
+                                        </t>
+                                    </t>
+                                    <t t-foreach="doc.saldos_lines" t-as="line_suc">
+                                        <t t-if="line_suc.type=='w'">
+                                            <t t-if="line_suc.warehouse_id.id==old_warehouse">
+                                                <tr style="font-size:11px">
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top" colspan="2">
+                                                        <div>
+                                                            <strong>Resumen de almacén: </strong> <t t-esc="old_warehouse_name"/>
+                                                        </div>
+                                                    </td>
+
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.entr_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.entr_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.out_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.out_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.balance_act_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.balance_act_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.reserved_quants)"/>
+                                                    </td>
+                                                </tr>
+                                                                <t t-set="sum_total_balance_prev_unids" t-value="sum_total_balance_prev_unids+ line_suc.balance_prev_unids"/>
+                                                                <t t-set="sum_total_balance_prev_values" t-value="sum_total_balance_prev_values + line_suc.balance_prev_values"/>
+                                                                <t t-set="sum_total_entr_unids" t-value="sum_total_entr_unids + line_suc.entr_unids"/>
+                                                                <t t-set="sum_total_entr_values" t-value="sum_total_entr_values + line_suc.entr_values"/>
+                                                                <t t-set="sum_total_out_unids" t-value="sum_total_out_unids + line_suc.out_unids"/>
+                                                                <t t-set="sum_total_out_values" t-value="sum_total_out_values + line_suc.out_values"/>
+                                                                <t t-set="sum_total_balance_act_unids" t-value="sum_total_balance_act_unids + line_suc.balance_act_unids"/>
+                                                                <t t-set="sum_total_balance_act_values" t-value="sum_total_balance_act_values + line_suc.balance_act_values"/>
+                                                                <t t-set="sum_total_reserved_quants" t-value="sum_total_reserved_quants + line_suc.reserved_quants"/>
+                                            </t>
+                                        </t>
+                                    </t>
+                                    
+                                    
+                                    
+                                    <t t-foreach="doc.saldos_lines" t-as="line_suc">
+                                        <t t-if="line_suc.type=='s'">
+                                            <t t-if="line_suc.sucursal.id==old_sucursal">
+                                                <tr style="font-size:11px">
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top" colspan="2">
+                                                        <div>
+                                                            <strong>Resumen de sucursal:</strong> <t t-esc="old_sucursal_name"/>
+                                                        </div>
+                                                    </td>
+
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.balance_prev_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.entr_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.entr_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.out_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.out_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.balance_act_unids)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        $<t t-esc="'{0:,.2f}'.format(line_suc.balance_act_values)"/>
+                                                    </td>
+                                                    <td style="padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                                        <t t-esc="'{0:,.2f}'.format(line_suc.reserved_quants)"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                    </t>
+                                
+<!--                                 Linea de sumatoria total -->
+                                <tr style="font-size:11px">
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top" colspan="2">
+                                        <div>
+                                            <strong>Resumen Total</strong>
+                                        </div>
+                                    </td>
+
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                        <t t-esc="'{0:,.2f}'.format(sum_total_balance_prev_unids)"/>
+                                    </td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                       $<t t-esc="'{0:,.2f}'.format(sum_total_balance_prev_values)"/>
+                                    </td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                        <t t-esc="'{0:,.2f}'.format(sum_total_entr_unids)"/>
+                                    </td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                        $<t t-esc="'{0:,.2f}'.format(sum_total_entr_values)"/>
+                                    </td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                        <t t-esc="'{0:,.2f}'.format(sum_total_out_unids)"/>
+                                    </td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                        $<t t-esc="'{0:,.2f}'.format(sum_total_out_values)"/>
+                                    </td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                        <t t-esc="'{0:,.2f}'.format(sum_total_balance_act_unids)"/>
+                                    </td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                        $<t t-esc="'{0:,.2f}'.format(sum_total_balance_act_values)"/>
+                                    </td>
+                                    <td style="border-top: 1px solid black;padding: 0;margin: 0;padding-top: 0;vertical-align:top">
+                                        <t t-esc="'{0:,.2f}'.format(sum_total_reserved_quants)"/>
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                            
+                            
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

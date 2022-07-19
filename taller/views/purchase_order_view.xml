@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+		<!--Herencia de pedido de compra para mostrar campos tipo y diario en las vistas-->
+	<record id="purchase_order_tree" model="ir.ui.view">
+        <field name="name">purchase_order_tree</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree" />
+        <field name="arch" type="xml">
+            <field name="operating_unit_id" position="after">
+                <field name="tipo"/>
+                <field name="journal_id" domain="[('type','=','purchase'),('tipo','=',tipo)]"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="purchase_order_form" model="ir.ui.view">
+        <field name="name">purchase_order_form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form" />
+        <field name="arch" type="xml">
+            <field name="incoterm_id" position="after">
+                <field name="tipo"/>
+                <field name="journal_id" domain="[('type','=','purchase'),('tipo','=',tipo)]"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_purchase_order_filter" model="ir.ui.view">
+        <field name="name">view_purchase_order_filter</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_filter" />
+        <field name="arch" type="xml">
+            <field name="operating_unit_id" position="after">
+                <field name="tipo" />
+                <field name="journal_id" domain="[('type','=','purchase'),('tipo','=',tipo)]"/>
+            </field>
+        </field>
+    </record>
+
+    <!--Formularios de compras para MENU DE COMPRAS-->
+ 	<record id="action_gastos_purchase_order_form" model="ir.actions.act_window">
+        <field name="name">Gastos</field>
+        <field name="res_model">purchase.order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="search_view_id" ref="purchase.view_purchase_order_filter" />
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="context">{'default_tipo':'gastos'}</field>
+        <field name="domain">[('tipo','=','gastos')]</field>
+    </record>
+
+
+    <record id="action_compra_maquinaria_purchase_order_form" model="ir.actions.act_window">
+        <field name="name">Compra de Maquinaria</field>
+        <field name="res_model">purchase.order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="search_view_id" ref="purchase.view_purchase_order_filter" />
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="context">{'default_tipo':'maquinaria'}</field>
+        <field name="domain">[('tipo','=','maquinaria')]</field>
+    </record>
+
+    <record id="action_compra_refacciones_purchase_order_form" model="ir.actions.act_window">
+        <field name="name">Compra de Refacciones</field>
+        <field name="res_model">purchase.order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="search_view_id" ref="purchase.view_purchase_order_filter" />
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="context">{'default_tipo':'refacciones'}</field>
+        <field name="domain">[('tipo','=','refacciones')]</field>
+    </record>
+
+     <record id="action_taller_purchase_order_form" model="ir.actions.act_window">
+        <field name="name">Compras Otros Talleres</field>
+        <field name="res_model">purchase.order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="search_view_id" ref="purchase.view_purchase_order_filter" />
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="context">{'default_tipo':'taller'}</field>
+        <field name="domain">[('tipo','=','taller')]</field>
+    </record>
+
+    <menuitem id="menu_gastos"
+            action="action_gastos_purchase_order_form"
+            parent="purchase.menu_procurement_management"
+            sequence="100" />
+
+    <menuitem id="menu_purchase_maquinaria"
+            action="action_compra_maquinaria_purchase_order_form"
+            parent="purchase.menu_procurement_management"
+            sequence="150" />
+
+    <menuitem id="menu_purchase_refacciones"
+            action="action_compra_refacciones_purchase_order_form"
+            parent="purchase.menu_procurement_management"
+            sequence="170" />
+
+    <menuitem id="menu_taller"
+            action="action_taller_purchase_order_form"
+            parent="purchase.menu_procurement_management"
+            sequence="200" />
+
+</odoo>

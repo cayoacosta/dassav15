@@ -1,0 +1,1040 @@
+<odoo>
+    <data>
+        <report id="ctt_dassa_reports_ventas_departamento_report"
+                model="report.ventas_departamento"
+                string="Reporte de ventas por departamento"
+                report_type="qweb-pdf"
+                name="ctt_dassa_reports.ventas_departamento"
+                file="ctt_dassa_reports.ventas_departamento_report"
+                attachment_use="True"
+                print_report_name="('VENTAS POR DEPARTAMENTO')"
+                paperformat="base.paperformat_us" />
+        
+        <template id="ventas_departamento">
+            <t t-call="web.html_container">
+                <t t-call="ctt_dassa_reports.external_layout_ventdep_dassa">
+                    <t t-foreach="docs" t-as="doc"> 
+                        <div class="page">
+                            
+                            <strong><div>Filtros aplicados</div></strong>
+                            <div style="float:left;width:33%;">
+                                <div>Sucursal: <t t-esc="doc.sucursal.name"/></div>
+                                <div>Fecha al: <t t-esc="doc.date.strftime('%d/%m/%Y')"/></div>
+                                    </div>
+                                    <div style="float:left;width:33%;">
+                                        <div>
+                                            Diarios: <t t-if="len(doc.journal_ids)==0">Todos</t><t t-else=""> Selecciono <t t-esc="len(doc.journal_ids)"/> diarios</t>
+                                        </div>
+                                    </div>
+                                    <div style="float:left;width:33%;">
+                                        
+                            </div>
+                            <div style="clear: both">
+                                <h2>Ventas por departamento, del día <t t-esc="doc.date.strftime('%d/%m/%Y')"/></h2>
+                            </div>
+                            <table style="width:100%; margin-top: 0;page-break-after:always;padding-right: 20px;font-size:13px">
+                                <thead style="display:table-header-group;font-size:12px">
+                                    <tr>
+                                        <th><div>Departamento</div></th>
+                                        <th><div>Costo</div></th>
+                                        <th><div>Venta neta</div></th>
+                                        <th><div>Crédito</div></th>
+                                        <th><div>Contado</div></th>
+                                        <th><div>Iva</div></th>
+                                        <th><div>Total</div></th>
+                                        <th><div>Margen</div></th>
+                                        <th><div>%</div></th>
+                                    </tr>
+                                </thead>
+<!-- VENTAS DEL DIA -->      
+                                <t t-set="show_section" t-value="False"/>
+                                <t t-foreach="doc.report_verificator_lines" t-as="ver">
+                                    <t t-if="ver.type=='sale_day'">
+                                        <t t-if="ver.show_departament==True">
+                                            <t t-set="show_section" t-value="True"/>
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-if="show_section==True">
+                                    <tr>
+                                        <td colspan="9">
+                                            <span><strong>Ventas del día</strong></span>
+                                        </td>
+                                    </tr>
+                                    <!-- VARIABLES PARA LAS SUMATORIAS-->
+                                    <t t-set="cost" t-value="0.0"/>
+                                    <t t-set="sale_neto" t-value="0.0"/>
+                                    <t t-set="credit" t-value="0.0"/>
+                                    <t t-set="debit" t-value="0.0"/>
+                                    <t t-set="iva" t-value="0.0"/>
+                                    <t t-set="total" t-value="0.0"/>
+                                    <t t-set="margin" t-value="0.0"/>
+                                    <t t-set="subtotal" t-value="0.0"/>
+                                    <!-- VARIABLES PARA LA SUMATORIA DE SUBTOTALES DE LAS CUENTAS -->
+                                    <t t-set="account_subtotal" t-value="0.0"/>
+
+                                    <t t-foreach="doc.report_lines" t-as="line">
+                                        <t t-if="line.type=='sale_day'">
+                                            <t t-if="line.desglosado==False">
+                                                <tr>
+                                                    <td style="padding-top: 0;vertical-align:top;width:26%;vertical-align:top">
+                                                        <div><t t-esc="line.departament"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.cost)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.sale_neto)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.credit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.debit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.iva)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.total)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.margin)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div><t t-esc="'{:,.2f}'.format(line.perc)"/>%</div>
+                                                    </td>
+                                                </tr>
+                                                <t t-foreach="doc.report_lines" t-as="line_desgl">
+                                                    <t t-if="line_desgl.type=='sale_day'">
+                                                        <t t-if="line_desgl.account_id.id">
+                                                            <t t-if="line_desgl.departament==line.departament">
+                                                                <tr>
+                                                                    <td style="padding-top: 0;vertical-align:top;width:26%">
+                                                                        <i><div><t t-esc="line_desgl.account_id.name"/></div></i>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.cost)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.sale_neto)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.credit)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.debit)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.iva)"/></div>
+                                                                    </td>
+
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.subtotal)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.margin)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div><t t-esc="'{:,.2f}'.format(line_desgl.perc)"/>%</div>
+                                                                    </td>
+                                                                    <t t-set="account_subtotal" t-value="account_subtotal+line_desgl.subtotal"/>
+
+                                                                </tr>
+                                                            </t>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                                <!-- SUMATORIAS DE LOS CAMPOS -->
+                                                <t t-set="cost" t-value="cost+line.cost"/>
+                                                <t t-set="sale_neto" t-value="sale_neto+line.sale_neto"/>
+                                                <t t-set="credit" t-value="credit+line.credit"/>
+                                                <t t-set="debit" t-value="debit+line.debit"/>
+                                                <t t-set="iva" t-value="iva+line.iva"/>
+                                                <t t-set="total" t-value="total+line.total"/>
+                                                <t t-set="margin" t-value="margin+line.margin"/>
+                                            </t>
+                                        </t>
+                                    </t>
+                                    <t t-if="total-account_subtotal!=0">
+                                        <tr>
+                                            <td style="padding: 0;padding-top: 0;vertical-align:top" colspan="6">
+                                                <div>Impuestos:</div>
+                                            </td>
+                                            <td style="padding: 0;padding-top: 0;vertical-align:top">
+                                                <div>$<t t-esc="'{:,.2f}'.format(total-account_subtotal)"/></div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </t>
+                                    <tr>
+                                        <td></td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(cost)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(sale_neto)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(credit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(debit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(iva)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(total)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(margin)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <t t-if="sale_neto!=0">
+                                                <b><t t-esc="'{:,.2f}'.format((margin*100)/sale_neto)"/>%</b>
+                                            </t>
+                                            <t t-else="">
+                                                <b>0.00%</b>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <!--RE INICIALIZACION DE VARIABLES -->
+                                <t t-set="cost" t-value="0.0"/>
+                                <t t-set="sale_neto" t-value="0.0"/>
+                                <t t-set="credit" t-value="0.0"/>
+                                <t t-set="debit" t-value="0.0"/>
+                                <t t-set="iva" t-value="0.0"/>
+                                <t t-set="total" t-value="0.0"/>
+                                <t t-set="margin" t-value="0.0"/>
+                                <t t-set="show_section" t-value="False"/>
+<!-- VENTAS ACUMULADAS -->
+                                <t t-set="show_section" t-value="False"/>
+                                <t t-foreach="doc.report_verificator_lines" t-as="ver">
+                                    <t t-if="ver.type=='sale_acum'">
+                                        <t t-if="ver.show_departament==True">
+                                            <t t-set="show_section" t-value="True"/>
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-if="show_section==True">
+                                    <tr>
+                                        <td colspan="9">
+                                            <span><strong>Ventas acumuladas</strong></span>
+                                        </td>
+                                    </tr>
+                                    <t t-foreach="doc.report_lines" t-as="line">
+                                        <t t-if="line.type=='sale_acum'">
+                                            <t t-if="line.account_id.id==False">
+                                                <tr>
+                                                    <td style="padding-top: 0;vertical-align:top;width:26%">
+                                                        <div><t t-esc="line.departament"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.cost)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.sale_neto)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.credit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.debit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.iva)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.total)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.margin)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div><t t-esc="'{:,.2f}'.format(line.perc)"/>%</div>
+                                                    </td>
+                                                </tr>
+
+                                                <!-- SUMATORIAS DE LOS CAMPOS -->
+                                                <t t-set="cost" t-value="cost+line.cost"/>
+                                                <t t-set="sale_neto" t-value="sale_neto+line.sale_neto"/>
+                                                <t t-set="credit" t-value="credit+line.credit"/>
+                                                <t t-set="debit" t-value="debit+line.debit"/>
+                                                <t t-set="iva" t-value="iva+line.iva"/>
+                                                <t t-set="total" t-value="total+line.total"/>
+                                                <t t-set="margin" t-value="margin+line.margin"/>
+                                            </t>
+                                        </t>
+
+                                    </t>
+                                    <tr>
+                                        <td></td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(cost)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(sale_neto)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(credit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(debit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(iva)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(total)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(margin)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <t t-if="sale_neto!=0">
+                                                <b><t t-esc="'{:,.2f}'.format((margin*100)/sale_neto)"/>%</b>
+                                            </t>
+                                            <t t-else="">
+                                                <b>0.00%</b>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-set="cost" t-value="0.0"/>
+                                <t t-set="sale_neto" t-value="0.0"/>
+                                <t t-set="credit" t-value="0.0"/>
+                                <t t-set="debit" t-value="0.0"/>
+                                <t t-set="iva" t-value="0.0"/>
+                                <t t-set="total" t-value="0.0"/>
+                                <t t-set="margin" t-value="0.0"/>
+                                <t t-set="account_subtotal" t-value="0.0"/>
+                            <!-- DEVOLUCIONES DEL DIA-->
+                                <t t-set="show_section" t-value="False"/>
+                                <t t-foreach="doc.report_verificator_lines" t-as="ver">
+                                    <t t-if="ver.type=='return_day'">
+                                        <t t-if="show_departament==True">
+                                            <t t-set="show_section" t-value="True"/>
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-if="show_section==True">
+                                    <tr>
+                                        <td colspan="9">
+                                            <span><strong>Devoluciones del día</strong></span>
+                                        </td>
+                                    </tr>
+                                    <t t-foreach="doc.report_lines" t-as="line">
+                                        <t t-if="line.type=='return_day'">
+                                            <t t-if="line.desglosado==False">
+                                                <tr>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div><t t-esc="line.departament"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.cost)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.sale_neto)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.credit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.debit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.iva)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.total)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.margin)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div><t t-esc="'{:,.2f}'.format(line.perc)"/>%</div>
+                                                    </td>
+                                                </tr>
+                                                <t t-foreach="doc.report_lines" t-as="line_desgl">
+                                                    <t t-if="line_desgl.type=='return_day'">
+                                                        <t t-if="line_desgl.account_id.id">
+                                                            <t t-if="line_desgl.departament==line.departament">
+                                                                <tr>
+                                                                    <td style="padding-top: 0;vertical-align:top;width:26%">
+                                                                        <i><div><t t-esc="line_desgl.account_id.name"/></div></i>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.cost)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.sale_neto)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.credit)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.debit)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.iva)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.subtotal)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.margin)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div><t t-esc="'{:,.2f}'.format(line_desgl.perc)"/>%</div>
+                                                                    </td>
+                                                                    <t t-set="account_subtotal" t-value="account_subtotal+line_desgl.subtotal"/>
+                                                                </tr>
+                                                            </t>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                                <!-- SUMATORIAS DE LOS CAMPOS -->
+                                                <t t-set="cost" t-value="cost+line.cost"/>
+                                                <t t-set="sale_neto" t-value="sale_neto+line.sale_neto"/>
+                                                <t t-set="credit" t-value="credit+line.credit"/>
+                                                <t t-set="debit" t-value="debit+line.debit"/>
+                                                <t t-set="iva" t-value="iva+line.iva"/>
+                                                <t t-set="total" t-value="total+line.total"/>
+                                                <t t-set="margin" t-value="margin+line.margin"/>
+
+                                           </t> 
+                                        </t>
+                                    </t>
+                                    <t t-if="total-account_subtotal!=0">
+                                        <tr>
+                                            <td style="padding: 0;padding-top: 0;vertical-align:top" colspan="6">
+                                                <div>Impuestos:</div>
+                                            </td>
+                                            <td style="padding: 0;padding-top: 0;vertical-align:top">
+                                                <div>$<t t-esc="'{:,.2f}'.format(total-account_subtotal)"/></div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </t>
+                                    <tr>
+                                        <td></td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(cost)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(sale_neto)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(credit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(debit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(iva)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(total)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(margin)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <t t-if="sale_neto!=0">
+                                                <b><t t-esc="'{:,.2f}'.format((margin*100)/sale_neto)"/>%</b>
+                                            </t>
+                                            <t t-else="">
+                                                <b>0.00%</b>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-set="cost" t-value="0.0"/>
+                                <t t-set="sale_neto" t-value="0.0"/>
+                                <t t-set="credit" t-value="0.0"/>
+                                <t t-set="debit" t-value="0.0"/>
+                                <t t-set="iva" t-value="0.0"/>
+                                <t t-set="total" t-value="0.0"/>
+                                <t t-set="margin" t-value="0.0"/>
+                                <t t-set="account_subtotal" t-value="0.0"/> 
+<!-- DEVOLUCIONES ACUMULADAS-->
+                                <t t-set="show_section" t-value="False"/>
+                                <t t-foreach="doc.report_verificator_lines" t-as="ver">
+                                    <t t-if="ver.type=='return_acum'">
+                                        <t t-if="ver.show_departament==True">
+                                            <t t-set="show_section" t-value="True"/>
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-if="show_section==True">
+                                   <tr>
+                                        <td colspan="9">
+                                            <span><strong>Devoluciones acumuladas</strong></span>
+                                        </td>
+                                    </tr>
+                                    <t t-foreach="doc.report_lines" t-as="line">
+                                        <t t-if="line.type=='return_acum'">
+
+                                                <tr>
+                                                    <td style="padding-top: 0;vertical-align:top;width:26%">
+                                                        <div><t t-esc="line.departament"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.cost)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.sale_neto)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.credit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.debit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.iva)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.total)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.margin)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div><t t-esc="'{:,.2f}'.format(line.perc)"/>%</div>
+                                                    </td>
+                                                </tr>
+                                                <!-- DESGLOSANDO POR CUENTA -->
+
+                                                <!-- SUMATORIAS DE LOS CAMPOS -->
+                                                <t t-set="cost" t-value="cost+line.cost"/>
+                                                <t t-set="sale_neto" t-value="sale_neto+line.sale_neto"/>
+                                                <t t-set="credit" t-value="credit+line.credit"/>
+                                                <t t-set="debit" t-value="debit+line.debit"/>
+                                                <t t-set="iva" t-value="iva+line.iva"/>
+                                                <t t-set="total" t-value="total+line.total"/>
+                                                <t t-set="margin" t-value="margin+line.margin"/>
+                                        </t>
+                                    </t>
+                                    <tr>
+                                        <td></td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(cost)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(sale_neto)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(credit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(debit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(iva)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(total)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(margin)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <t t-if="sale_neto!=0">
+                                                <b><t t-esc="'{:,.2f}'.format((margin*100)/sale_neto)"/>%</b>
+                                            </t>
+                                            <t t-else="">
+                                                <b>0.00%</b>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                                
+                                <t t-set="cost" t-value="0.0"/>
+                                <t t-set="sale_neto" t-value="0.0"/>
+                                <t t-set="credit" t-value="0.0"/>
+                                <t t-set="debit" t-value="0.0"/>
+                                <t t-set="iva" t-value="0.0"/>
+                                <t t-set="total" t-value="0.0"/>
+                                <t t-set="margin" t-value="0.0"/>
+                                <t t-set="account_subtotal" t-value="0.0"/>   
+                                
+                                
+                                 
+<!-- BONIFICACIONES DEL DIA -->
+                                
+                                
+                                <!--RE INICIALIZACION DE VARIABLES -->
+                                <t t-set="cost" t-value="0.0"/>
+                                <t t-set="sale_neto" t-value="0.0"/>
+                                <t t-set="credit" t-value="0.0"/>
+                                <t t-set="debit" t-value="0.0"/>
+                                <t t-set="iva" t-value="0.0"/>
+                                <t t-set="total" t-value="0.0"/>
+                                <t t-set="margin" t-value="0.0"/>
+                                <t t-set="account_subtotal" t-value="0.0"/>
+                                <t t-set="show_section" t-value="False"/>
+                                <t t-foreach="doc.report_verificator_lines" t-as="ver">
+                                    <t t-if="ver.type=='bonif_day'">
+                                        <t t-if="ver.show_departament==True">
+                                            <t t-set="show_section" t-value="True"/>
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-if="show_section==True">
+                                    <tr>
+                                        <td colspan="9">
+                                            <span><strong>Bonificaciones del día</strong></span>
+                                        </td>
+                                    </tr>
+                                    <t t-foreach="doc.report_lines" t-as="line">
+                                        <t t-if="line.type=='bonif_day'">
+                                            <t t-if="line.desglosado==False">
+                                                <tr>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div><t t-esc="line.departament"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.cost)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.sale_neto)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.credit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.debit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.iva)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.total)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.margin)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div><t t-esc="'{:,.2f}'.format(line.perc)"/>%</div>
+                                                    </td>
+                                                </tr>
+                                                <t t-foreach="doc.report_lines" t-as="line_desgl">
+                                                    <t t-if="line_desgl.type=='bonif_day'">
+                                                        <t t-if="line_desgl.account_id.id">
+                                                            <t t-if="line_desgl.departament==line.departament">
+                                                                <tr>
+                                                                    <td style="padding-top: 0;vertical-align:top;width:26%">
+                                                                        <i><div><t t-esc="line_desgl.account_id.name"/></div></i>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.cost)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.sale_neto)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.credit)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.debit)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.iva)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.subtotal)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div>$<t t-esc="'{:,.2f}'.format(line_desgl.margin)"/></div>
+                                                                    </td>
+                                                                    <td style="padding-top: 0;vertical-align:top">
+                                                                        <div><t t-esc="'{:,.2f}'.format(line_desgl.perc)"/>%</div>
+                                                                    </td>
+                                                                    <t t-set="account_subtotal" t-value="account_subtotal+line_desgl.subtotal"/>
+                                                                </tr>
+                                                            </t>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                                <!-- SUMATORIAS DE LOS CAMPOS -->
+                                                <t t-set="cost" t-value="cost+line.cost"/>
+                                                <t t-set="sale_neto" t-value="sale_neto+line.sale_neto"/>
+                                                <t t-set="credit" t-value="credit+line.credit"/>
+                                                <t t-set="debit" t-value="debit+line.debit"/>
+                                                <t t-set="iva" t-value="iva+line.iva"/>
+                                                <t t-set="total" t-value="total+line.total"/>
+                                                <t t-set="margin" t-value="margin+line.margin"/>
+                                             </t>
+                                        </t>
+                                    </t>
+                                    <t t-if="total-account_subtotal!=0">
+                                        <tr>
+                                            <td style="padding: 0;padding-top: 0;vertical-align:top" colspan="6">
+                                                <div>Impuestos:</div>
+                                            </td>
+                                            <td style="padding: 0;padding-top: 0;vertical-align:top">
+                                                <div>$<t t-esc="'{:,.2f}'.format(total-account_subtotal)"/></div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </t>
+                                    <tr>
+                                        <td></td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(cost)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(sale_neto)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(credit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(debit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(iva)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(total)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(margin)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <t t-if="sale_neto!=0">
+                                                <b><t t-esc="'{:,.2f}'.format((margin*100)/sale_neto)"/>%</b>
+                                            </t>
+                                            <t t-else="">
+                                               <b>0.00%</b>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-set="cost" t-value="0.0"/>
+                                <t t-set="sale_neto" t-value="0.0"/>
+                                <t t-set="credit" t-value="0.0"/>
+                                <t t-set="debit" t-value="0.0"/>
+                                <t t-set="iva" t-value="0.0"/>
+                                <t t-set="total" t-value="0.0"/>
+                                <t t-set="margin" t-value="0.0"/>
+                                <t t-set="account_subtotal" t-value="0.0"/>  
+<!-- BONIFICACIOENS ACUMULADAS -->
+                                <t t-set="show_section" t-value="False"/>
+                                <t t-foreach="doc.report_verificator_lines" t-as="ver">
+                                    <t t-if="ver.type=='bonif_acum'">
+                                        <t t-if="show_departament==True">
+                                            <t t-set="ver.show_section" t-value="True"/>
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-if="show_section==True">
+                                    <tr>
+                                        <td colspan="9">
+                                                <span><strong>Bonificaciones acumuladas</strong></span>
+                                        </td>
+                                    </tr>
+                                    <t t-foreach="doc.report_lines" t-as="line">
+                                        <t t-if="line.type=='bonif_acum'">
+
+                                                <tr>
+                                                    <td style="padding-top: 0;vertical-align:top;width:26%">
+                                                        <div><t t-esc="line.departament"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.cost)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.sale_neto)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.credit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.debit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.iva)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.total)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.margin)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div><t t-esc="'{:,.2f}'.format(line.perc)"/>%</div>
+                                                    </td>
+                                                </tr>
+                                                <!-- DESGLOSANDO POR CUENTA -->
+
+                                                <!-- SUMATORIAS DE LOS CAMPOS -->
+                                                <t t-set="cost" t-value="cost+line.cost"/>
+                                                <t t-set="sale_neto" t-value="sale_neto+line.sale_neto"/>
+                                                <t t-set="credit" t-value="credit+line.credit"/>
+                                                <t t-set="debit" t-value="debit+line.debit"/>
+                                                <t t-set="iva" t-value="iva+line.iva"/>
+                                                <t t-set="total" t-value="total+line.total"/>
+                                                <t t-set="margin" t-value="margin+line.margin"/>
+                                        </t>
+                                    </t>
+                                    <tr>
+                                        <td></td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(cost)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(sale_neto)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(credit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(debit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(iva)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(total)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(margin)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <t t-if="sale_neto!=0">
+                                                <b><t t-esc="'{:,.2f}'.format((margin*100)/sale_neto)"/>%</b>
+                                            </t>
+                                            <t t-else="">
+                                                <b>0.00%</b>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                                
+                                <t t-set="cost" t-value="0.0"/>
+                                <t t-set="sale_neto" t-value="0.0"/>
+                                <t t-set="credit" t-value="0.0"/>
+                                <t t-set="debit" t-value="0.0"/>
+                                <t t-set="iva" t-value="0.0"/>
+                                <t t-set="total" t-value="0.0"/>
+                                <t t-set="margin" t-value="0.0"/>
+                                <t t-set="account_subtotal" t-value="0.0"/>   
+                        <!-- VENTAS - DEVOLUCIONES/BONIFICACIONES -->
+                                <t t-set="show_section" t-value="False"/>
+                                <t t-foreach="doc.report_verificator_lines" t-as="ver">
+                                    <t t-if="ver.type=='sale_bonif_return'">
+                                        <t t-if="ver.show_departament==True">
+                                            <t t-set="show_section" t-value="True"/>
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-if="show_section==True">
+                                    <tr>
+                                        <td colspan="9">
+                                            <span><strong>Ventas - (devoluciones/bonificaciones)</strong></span>
+                                        </td>
+                                    </tr>
+                                    <t t-foreach="doc.report_lines" t-as="line">
+                                        <t t-if="line.type=='sale_bonif_return'">
+
+                                                <tr>
+                                                    <td style="padding-top: 0;vertical-align:top;width:26%">
+                                                        <div><t t-esc="line.departament"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.cost)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.sale_neto)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.credit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.debit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.iva)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.total)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.margin)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div><t t-esc="'{:,.2f}'.format(line.perc)"/>%</div>
+                                                    </td>
+                                                </tr>
+                                                <!-- DESGLOSANDO POR CUENTA -->
+
+                                                <!-- SUMATORIAS DE LOS CAMPOS -->
+                                                <t t-set="cost" t-value="cost+line.cost"/>
+                                                <t t-set="sale_neto" t-value="sale_neto+line.sale_neto"/>
+                                                <t t-set="credit" t-value="credit+line.credit"/>
+                                                <t t-set="debit" t-value="debit+line.debit"/>
+                                                <t t-set="iva" t-value="iva+line.iva"/>
+                                                <t t-set="total" t-value="total+line.total"/>
+                                                <t t-set="margin" t-value="margin+line.margin"/>
+                                        </t>
+                                    </t>
+                                    <tr>
+                                        <td></td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(cost)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(sale_neto)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(credit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(debit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(iva)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(total)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(margin)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <t t-if="sale_neto!=0">
+                                                <b><t t-esc="'{:,.2f}'.format((margin*100)/sale_neto)"/>%</b>
+                                            </t>
+                                            <t t-else="">
+                                                <b>0.00%</b>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                                
+                                <t t-set="cost" t-value="0.0"/>
+                                <t t-set="sale_neto" t-value="0.0"/>
+                                <t t-set="credit" t-value="0.0"/>
+                                <t t-set="debit" t-value="0.0"/>
+                                <t t-set="iva" t-value="0.0"/>
+                                <t t-set="total" t-value="0.0"/>
+                                <t t-set="margin" t-value="0.0"/>
+                                <t t-set="account_subtotal" t-value="0.0"/>  
+                                
+                            <!-- VENTAS - DEVOLUCIONES/BONIFICACIONES ACUMULADAS-->
+                                <t t-set="show_section" t-value="False"/>
+                                <t t-foreach="doc.report_verificator_lines" t-as="ver">
+                                    <t t-if="ver.type=='sale_bonif_return_acum'">
+                                        <t t-if="ver.show_departament==True">
+                                            <t t-set="show_section" t-value="True"/>
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-if="show_section==True">
+                                    <tr>
+                                        <td colspan="9">
+                                            <span><strong>Ventas - (devoluciones/bonificaciones) acumuladas</strong></span>
+                                        </td>
+                                    </tr>
+                                    <t t-foreach="doc.report_lines" t-as="line">
+                                        <t t-if="line.type=='sale_bonif_return_acum'">
+
+                                                <tr>
+                                                    <td style="padding-top: 0;vertical-align:top;width:26%">
+                                                        <div><t t-esc="line.departament"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.cost)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.sale_neto)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.credit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.debit)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.iva)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.total)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div>$<t t-esc="'{:,.2f}'.format(line.margin)"/></div>
+                                                    </td>
+                                                    <td style="padding-top: 0;vertical-align:top">
+                                                        <div><t t-esc="'{:,.2f}'.format(line.perc)"/>%</div>
+                                                    </td>
+                                                </tr>
+                                                <!-- DESGLOSANDO POR CUENTA -->
+
+                                                <!-- SUMATORIAS DE LOS CAMPOS -->
+                                                <t t-set="cost" t-value="cost+line.cost"/>
+                                                <t t-set="sale_neto" t-value="sale_neto+line.sale_neto"/>
+                                                <t t-set="credit" t-value="credit+line.credit"/>
+                                                <t t-set="debit" t-value="debit+line.debit"/>
+                                                <t t-set="iva" t-value="iva+line.iva"/>
+                                                <t t-set="total" t-value="total+line.total"/>
+                                                <t t-set="margin" t-value="margin+line.margin"/>
+                                        </t>
+                                    </t>
+                                    <tr>
+                                        <td></td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(cost)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(sale_neto)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(credit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(debit)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(iva)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(total)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <b>$<t t-esc="'{:,.2f}'.format(margin)"/></b>
+                                        </td>
+                                        <td style="border-top: 1px solid black;padding-top: 0;vertical-align:top">
+                                            <t t-if="sale_neto!=0">
+                                                <b><t t-esc="'{:,.2f}'.format((margin*100)/sale_neto)"/>%</b>
+                                            </t>
+                                            <t t-else="">
+                                                <b>0.00%</b>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                                
+                                <t t-set="cost" t-value="0.0"/>
+                                <t t-set="sale_neto" t-value="0.0"/>
+                                <t t-set="credit" t-value="0.0"/>
+                                <t t-set="debit" t-value="0.0"/>
+                                <t t-set="iva" t-value="0.0"/>
+                                <t t-set="total" t-value="0.0"/>
+                                <t t-set="margin" t-value="0.0"/>
+                                <t t-set="account_subtotal" t-value="0.0"/>  
+                            </table>
+                            
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

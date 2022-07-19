@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sorp_view_order_form" model="ir.ui.view">
+        <field name="name">ordenes.de.reparacion.form</field>
+        <field name="model">ordenes.de.reparacion</field>
+        <field name="inherit_id" ref="taller.view_ordenes_de_reparacion_form"/>
+        <field name="arch" type="xml">
+            <button name="action_cancelar" position="after">
+                <button name="recalculate_prices" class="ml-2 btn btn-default"
+                        string="Recalculate prices" Help="Apply the current pricelist"
+                        type="object" attrs="{'invisible':[('state', 'not in', ('Confirmada'))]}"/>
+            </button>
+        </field>
+    </record>
+
+</odoo>

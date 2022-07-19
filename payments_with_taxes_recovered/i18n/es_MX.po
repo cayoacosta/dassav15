@@ -1,0 +1,63 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* payments_with_taxes_recovered
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 12.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-02-25 05:55+0000\n"
+"PO-Revision-Date: 2022-02-24 23:00-0700\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"Language: es_MX\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"X-Generator: Poedit 3.0.1\n"
+
+#. module: payments_with_taxes_recovered
+#: model:ir.model.fields,field_description:payments_with_taxes_recovered.field_account_payment__cash_payment
+msgid "Cash Amount"
+msgstr "Monto Contado"
+
+#. module: payments_with_taxes_recovered
+#: model:ir.model.fields,help:payments_with_taxes_recovered.field_account_payment__cash_payment
+msgid "Cash Invoices Paid Amount"
+msgstr "Monto de Facturas de Contado"
+
+#. module: payments_with_taxes_recovered
+#: model:ir.model.fields,field_description:payments_with_taxes_recovered.field_account_payment__cash_tax_paid
+msgid "Cash Tax Amount"
+msgstr "IVA Contado"
+
+#. module: payments_with_taxes_recovered
+#: model:ir.model.fields,field_description:payments_with_taxes_recovered.field_account_payment__credit_payment
+msgid "Credit Amount"
+msgstr "Monto Credito"
+
+#. module: payments_with_taxes_recovered
+#: model:ir.model.fields,help:payments_with_taxes_recovered.field_account_payment__credit_payment
+msgid "Credit Invoices Paid Amount"
+msgstr "Monto de Facturas de Credito"
+
+#. module: payments_with_taxes_recovered
+#: model:ir.model.fields,field_description:payments_with_taxes_recovered.field_account_payment__credit_tax_paid
+msgid "Credit Tax Amount"
+msgstr "IVA Credito"
+
+#. module: payments_with_taxes_recovered
+#: model:ir.model,name:payments_with_taxes_recovered.model_account_payment
+msgid "Payments"
+msgstr "Pago"
+
+#. module: payments_with_taxes_recovered
+#: model:ir.model.fields,help:payments_with_taxes_recovered.field_account_payment__cash_tax_paid
+msgid "Taxes for Cash Invoices"
+msgstr "IVA de Facturas de Contado"
+
+#. module: payments_with_taxes_recovered
+#: model:ir.model.fields,help:payments_with_taxes_recovered.field_account_payment__credit_tax_paid
+msgid "Taxes for Credit Invoices"
+msgstr "IVA de Facturas de Credito"
